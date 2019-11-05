@@ -1,0 +1,13 @@
+Owner: Sean Higgins
+Date: 5/11/19
+Brief: Build a small portal that will allow an admin to upload a .csv file to create and manage Looker users. 
+
+The portal will read the headers from the CSV and expect one column to be an email and the rest to be other data types. Those that are not email columns will be used for User Attributes. The user will be able to select which columns are used. The portal will validate the names of headers against User Attributes that already exist. The portal will use Looker’s API to set or update a user’s User Attribute value based on the corresponding cell value in the CSV.  
+
+A later iteration will also incorporate Groups. Again the portal will read the headers of the CSV and the user will select whether the column is to be used for a Group or User Attribute. 
+
+Goal: The aim of this is to have an easier way for Looker Admins to manage users, using CSV uploads and an offline spreadsheet that’s easy to read and edit. Circumventing Looker’s very cumbersome user management workflows and having a single element that coalesces Groups, Users and Attributes to a single action that obfuscates the API workflow we typically have to train people on when they want a single flow. 
+
+Build: I’ll likely build this with a Python backend so I can use Pandas which is good for reading csvs and creating dataframes that a) hold data in an easy to understand structure and b) be easily parsed for firing off requests
+
+
