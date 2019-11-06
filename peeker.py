@@ -18,16 +18,29 @@ data.head()
 
 
 datanonnulls = data.dropna()
-def create_groups(csvheader):
-	unique_column_values = (datanonnulls[csvheader].unique())
-	nonexistentgroups = set(unique_column_values) - set(all_group_names)
 
+def create_groups(csvheader):
+	all_groups = sdk.all_groups()
+	all_group_names = []
+	i=0
+	while i < len(all_groups):
+		all_group_names.append(all_groups[i].name)
+		i+=1
+	unique_column_values = (datanonnulls[csvheader].unique())
+	nonexistentgroups = []
+	for office in unique_column_values:
+		if office not in all_group_names:
+			nonexistentgroups.append(office)
+	print (nonexistentgroups)
 	for group in nonexistentgroups:
 		payload = {"name":group}
 		payloadjson=json.dumps(payload)
 		print (payloadjson)
-		sdk.create_group(payloadjson)
-		print("Created New Group " + group)
+		try:
+			sdk.create_group(payloadjson)
+			print("Created New Group " + group)
+		except:
+			print(group + "Already Exists")
 
 def get_group_id_for_group_name(group_name):
 	all_group_names_and_ids = {}
@@ -56,11 +69,17 @@ def add_users_to_groups():
 		users[email]=office
 
 	for k,v in users.items():
-		userid = sdk.user_for_credential('email', 'Kirsten.Mitchell@dyson.com')
-		groupnameid = get_group_id_for_group_name(v)
-		users_group[userid.id] = groupnameid[v]
-		print(users_group)
-		# add a function that gets all the group_ids for all the groups in the csv
+		try:
+			userid = sdk.user_for_credential('email', k)
+			groupnameid = get_group_id_for_group_name(v)
+			users_group[userid.id] = groupnameid[v]
+			payload = {"user_id": userid.id}
+			payloadjson =json.dumps(payload)
+			sdk.add_group_user(groupnameid[v],payloadjson)
+		except:
+			"Group or User Not Found"
 
+		# add a function that gets all the group_ids for all the groups in the csv
+create_groups('Office')
 add_users_to_groups()
 
