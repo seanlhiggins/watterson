@@ -17,7 +17,6 @@ data.head()
 #     print(data['Name'][i],data['Office'][i])
 
 
-
 datanonnulls = data.dropna()
 def create_groups(csvheader):
 	unique_column_values = (datanonnulls[csvheader].unique())
@@ -43,6 +42,7 @@ def get_group_id_for_group_name(group_name):
 			newdict[k] = v
 	return (newdict)
 
+
 # create_groups(csvheadername)
 
 def add_users_to_groups():
@@ -53,8 +53,14 @@ def add_users_to_groups():
 		office = data['Office'][i]
 		users[email]=office
 
-	for k,v in users:
-		sdk.add_group_user()
+	for k,v in users.items():
+		users_group = newDict()
+		userid = sdk.user_for_credential('Email Address', x).id
+		users_group = get_group_id_for_group_name(v)
+		users_group[users_group] = userid
 		# add a function that gets all the group_ids for all the groups in the csv
 
-get_group_id_for_group_name('Tokyo')	
+add_users_to_groups()
+
+
+
