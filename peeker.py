@@ -1,9 +1,9 @@
 import pandas as pd
 import json
 import sys
-import itertools
+import numpy as np
 
-sys.path.insert(1, '../looker_sdk')
+csvheadername = sys.argv[1]
 
 from looker_sdk import client, models
 
@@ -11,11 +11,11 @@ sdk = client.setup('looker.ini')
 
 data = pd.read_csv("examplelookerusers.csv") 
 data.head()
-# Preview the first 5 lines of the loaded data 
 
-mailgroup = {}
-for i in range(0,data.shape[0]):
-    print(data['Name'][i],data['Office'][i])
+#Testing appending names and offices together
+# mailgroup = {}
+# for i in range(0,data.shape[0]):
+#     print(data['Name'][i],data['Office'][i])
 
 all_groups = sdk.all_groups()
 all_group_names = []
@@ -24,11 +24,16 @@ while i < len(all_groups):
 	all_group_names.append(all_groups[i].name)
 	i+=1
 
+datanonnulls = data.dropna()
+def create_groups(csvheader):
+	unique_column_values = (datanonnulls[csvheader].unique())
+	nonexistentgroups = set(unique_column_values) - set(all_group_names)
 
+	for group in nonexistentgroups:
+		payload = {"name":group}
+		payloadjson=json.dumps(payload)
+		print (payloadjson)
+		sdk.create_group(payloadjson)
+		print("Created New Group " + group)
 
-uniquemarkets = (data['Market'].unique())
-for market in uniquemarkets:
-	payload = {"name":market}
-	payloadjson=json.dumps(payload)
-	sdk.create_group(payloadjson)
-
+create_groups(csvheadername)
