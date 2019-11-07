@@ -12,5 +12,5 @@ A later iteration will also incorporate Groups. Again the portal will read the h
 
 <b>Build</b>: I’ll likely build this with a Python backend so I can use Pandas which is good for reading csvs and creating dataframes that a) hold data in an easy to understand structure and b) be easily parsed for firing off requests
 
-<b>Update (7/11/19): Spent a few days just creating the basic building blocks in terms of functions and calls to interpret what a user provides in a CSV to turn into Looker logic. Figuring out the edges of calls and helper functions needed later to make things work. 
+<b>Update (7/11/19)</b>: Spent a few days just creating the basic building blocks in terms of functions and calls to interpret what a user provides in a CSV to turn into Looker logic. Figuring out the edges of calls and helper functions needed later to make things work. 
 
