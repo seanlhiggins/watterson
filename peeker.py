@@ -23,7 +23,10 @@ def create_users(email):
 	for email in csv_users:
 		if not existing_users.get(email):
 			payload = {"name": email}
-
+			payloadjson=json.dumps(payload)
+			new_user = sdk.create_user(payloadjson)
+			existing_groups[new_user.name] = new_user.id
+			print("Created New User " + email)
 ## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
 ## - Find more efficient ways to check if the groups and users already exist that doesn't involve
 ##   looping through every group and comparing against the all_groups() call
