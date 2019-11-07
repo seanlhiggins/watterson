@@ -17,8 +17,21 @@ data.head()
 #     print(data['Name'][i],data['Office'][i])
 
 
+# Remove any rows that have nulls. A bit too intense but works fine for now.
 datanonnulls = data.dropna()
 
+# TODO: preliminary checks - 
+## - Check if the users exist already, if not, create them
+## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
+## - Find more efficient ways to check if the groups and users already exist that doesn't involve
+##   looping through every group and comparing against the all_groups() call
+## - Set what the expected Column Headers are so we don't need to explicitly set them in the script
+## - Raise errors for bad formats, header names etc. Just establish a codified .csv format
+## - Marry up the functions so that a user can just supply the path to a .csv and the script will take care of the rest
+##
+
+## Create the groups that are needed to add users to. 
+## Check if they exist and only create the ones that don't already
 def create_groups(csvheader):
 	all_groups = sdk.all_groups()
 	all_group_names = []
@@ -42,6 +55,9 @@ def create_groups(csvheader):
 		except:
 			print(group + "Already Exists")
 
+## Helper function to get the group_id for a supplied group_name.
+## Output in a dictionary so it can at least reference the right name/id pair.
+
 def get_group_id_for_group_name(group_name):
 	all_group_names_and_ids = {}
 	all_groups = sdk.all_groups()
@@ -58,6 +74,11 @@ def get_group_id_for_group_name(group_name):
 	return (newdict)
 
 # create_groups(csvheadername)
+
+## Main function that adds users found in the CSV to groups created by the create_groups() function
+## Needs to go get all the preexisting users (later I'll make a function that checks the users exist first)
+## Then with the list of Emails and Offices found in the CSV as a dict, pair them with the Groups and IDs
+## in the get_group_id_for_group_name() created dictionary and add them to the group. 
 
 def add_users_to_groups():
 	users = {}
@@ -79,7 +100,6 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-		# add a function that gets all the group_ids for all the groups in the csv
 create_groups('Office')
 add_users_to_groups()
 
