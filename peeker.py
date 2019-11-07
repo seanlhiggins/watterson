@@ -11,12 +11,6 @@ sdk = client.setup('looker.ini')
 data = pd.read_csv("examplelookerusers.csv") 
 data.head()
 
-#Testing appending names and offices together
-# mailgroup = {}
-# for i in range(0,data.shape[0]):
-#     print(data['Name'][i],data['Office'][i])
-
-
 # Remove any rows that have nulls. A bit too intense but works fine for now.
 datanonnulls = data.dropna()
 
@@ -32,43 +26,30 @@ datanonnulls = data.dropna()
 
 ## Create the groups that are needed to add users to. 
 ## Check if they exist and only create the ones that don't already
+
+
+
+
 def create_groups(csvheader):
-	all_groups = sdk.all_groups()
-	all_group_names = []
-	i=0
-	while i < len(all_groups):
-		all_group_names.append(all_groups[i].name)
-		i+=1
+	existing_groups = {group.name: group.id for group in sdk.all_groups()}
 	unique_column_values = (datanonnulls[csvheader].unique())
-	nonexistentgroups = []
-	for office in unique_column_values:
-		if office not in all_group_names:
-			nonexistentgroups.append(office)
-	print (nonexistentgroups)
-	for group in nonexistentgroups:
-		payload = {"name":group}
-		payloadjson=json.dumps(payload)
-		print (payloadjson)
-		try:
-			sdk.create_group(payloadjson)
+	for group in unique_column_values:
+		if not existing_groups.get(group):
+			payload = {"name":group}
+			payloadjson=json.dumps(payload)
+			new_group = sdk.create_group(payloadjson)
+			existing_groups[new_group.name] = new_group.id
 			print("Created New Group " + group)
-		except:
-			print(group + "Already Exists")
+
 
 ## Helper function to get the group_id for a supplied group_name.
 ## Output in a dictionary so it can at least reference the right name/id pair.
 
 def get_group_id_for_group_name(group_name):
-	all_group_names_and_ids = {}
-	all_groups = sdk.all_groups()
-	i=0
-	
-	while i < len(all_groups):
-		all_group_names_and_ids[all_groups[i].name] = all_groups[i].id
-		i+=1
+	existing_groups = {group.name: group.id for group in sdk.all_groups()}
 	newdict = dict()
 	
-	for (k,v) in all_group_names_and_ids.items():
+	for (k,v) in existing_groups.items():
 		if k == group_name:
 			newdict[k] = v
 	return (newdict)
@@ -81,9 +62,9 @@ def get_group_id_for_group_name(group_name):
 ## in the get_group_id_for_group_name() created dictionary and add them to the group. 
 
 def add_users_to_groups():
-	users = {}
+	users = dict()
 	users_group = dict()
-	
+
 	for i in range(0,data.shape[0]):
 		email = data['Email Address'][i]
 		office = data['Office'][i]
