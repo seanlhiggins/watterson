@@ -16,6 +16,14 @@ datanonnulls = data.dropna()
 
 # TODO: preliminary checks - 
 ## - Check if the users exist already, if not, create them
+
+def create_users(email):
+	existing_users = {user.name: user.id for user in sdk.all_users()}
+	csv_users = (datanotnulls[email].unique())
+	for email in csv_users:
+		if not existing_users.get(email):
+			payload = {"name": email}
+
 ## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
 ## - Find more efficient ways to check if the groups and users already exist that doesn't involve
 ##   looping through every group and comparing against the all_groups() call
