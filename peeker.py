@@ -27,9 +27,11 @@ def create_users(email):
 			new_user = sdk.create_user(payloadjson)
 			existing_groups[new_user.name] = new_user.id
 			print("Created New User " + email)
+		print("User " + email + " already exists.")
 ## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
 ## - Find more efficient ways to check if the groups and users already exist that doesn't involve
-##   looping through every group and comparing against the all_groups() call
+##   looping through every group and comparing against the all_groups() call - DONE
+
 ## - Set what the expected Column Headers are so we don't need to explicitly set them in the script
 ## - Raise errors for bad formats, header names etc. Just establish a codified .csv format
 ## - Marry up the functions so that a user can just supply the path to a .csv and the script will take care of the rest
@@ -82,6 +84,7 @@ def add_users_to_groups():
 		users[email]=office
 
 	for k,v in users.items():
+		create_users(k)
 		try:
 			userid = sdk.user_for_credential('email', k)
 			groupnameid = get_group_id_for_group_name(v)
