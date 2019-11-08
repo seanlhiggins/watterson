@@ -4,7 +4,8 @@ import sys
 import numpy as np
 from looker_sdk import client, models
 
-# csvheadername = sys.argv[1]
+emailheadername = sys.argv[1]
+groupheadername = sys.argv[2]
 
 sdk = client.setup('looker.ini')
 
@@ -15,7 +16,7 @@ data.head()
 datanonnulls = data.dropna()
 
 # TODO: preliminary checks - 
-## - Check if the users exist already, if not, create them
+## - Check if the users exist already, if not, create them - DONE
 
 def create_users(email):
 	existing_users = {user.name: user.id for user in sdk.all_users()}
@@ -28,6 +29,7 @@ def create_users(email):
 			existing_groups[new_user.name] = new_user.id
 			print("Created New User " + email)
 		print("User " + email + " already exists.")
+		
 ## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
 ## - Find more efficient ways to check if the groups and users already exist that doesn't involve
 ##   looping through every group and comparing against the all_groups() call - DONE
@@ -43,9 +45,9 @@ def create_users(email):
 
 
 
-def create_groups(csvheader):
+def create_groups(groupname):
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
-	unique_column_values = (datanonnulls[csvheader].unique())
+	unique_column_values = (datanonnulls[groupname].unique())
 	for group in unique_column_values:
 		if not existing_groups.get(group):
 			payload = {"name":group}
@@ -77,14 +79,15 @@ def get_group_id_for_group_name(group_name):
 def add_users_to_groups():
 	users = dict()
 	users_group = dict()
-
+	create_users(emailheadername)
+	create_groups(groupheadername)
 	for i in range(0,data.shape[0]):
 		email = data['Email Address'][i]
 		office = data['Office'][i]
 		users[email]=office
 
 	for k,v in users.items():
-		create_users(k)
+
 		try:
 			userid = sdk.user_for_credential('email', k)
 			groupnameid = get_group_id_for_group_name(v)
@@ -95,6 +98,6 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-create_groups('Office')
+
 add_users_to_groups()
 
