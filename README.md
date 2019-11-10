@@ -14,3 +14,5 @@ A later iteration will also incorporate Groups. Again the portal will read the h
 
 <b>Update (7/11/19)</b>: Spent a few days just creating the basic building blocks in terms of functions and calls to interpret what a user provides in a CSV to turn into Looker logic. Figuring out the edges of calls and helper functions needed later to make things work. 
 
+<b>Update (10/11/19)</b>: Did a bit of cleanup, prepped some stuff via Pandas so the eventual UI will have what it needs to construct an interface for selection of columns etc. Added a bunch of TODOs to keep a breadcrumb trail and keep focus on what's needed next.
+
