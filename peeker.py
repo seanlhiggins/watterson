@@ -3,14 +3,26 @@ import json
 import sys
 import numpy as np
 from looker_sdk import client, models
+import re
 
-emailheadername = sys.argv[1]
-groupheadername = sys.argv[2]
+# emailheadername = sys.argv[1]
+# groupheadername = sys.argv[2]
 
 sdk = client.setup('looker.ini')
 
+# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
 data = pd.read_csv("examplelookerusers.csv") 
 data.head()
+
+# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
+csvcolumnheaders = []
+for col in data.columns:
+	csvcolumnheaders.append(col)
+
+# Get just the email address header name so we can just quickly use it for creating users - DONE
+r=re.compile("(?i).*email*")
+emailheadername = list(filter(r.match,data.columns))[0]
+print (emailheadername)
 
 # Remove any rows that have nulls. A bit too intense but works fine for now.
 datanonnulls = data.dropna()
@@ -29,19 +41,21 @@ def create_users(email):
 			existing_groups[new_user.name] = new_user.id
 			print("Created New User " + email)
 		print("User " + email + " already exists.")
-		
-## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
-## - Find more efficient ways to check if the groups and users already exist that doesn't involve
-##   looping through every group and comparing against the all_groups() call - DONE
 
-## - Set what the expected Column Headers are so we don't need to explicitly set them in the script
+## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
+
+## - Find more efficient ways to check if the groups and users already exist that doesn't involve
+##   looping through every group and comparing against the all_groups() call - DONE (see create_ functions)
+
+## - Set what the expected Column Headers are so we don't need to explicitly set them in the script - PARTIALLY DONE (see column headers at top)
+
 ## - Raise errors for bad formats, header names etc. Just establish a codified .csv format
 ## - Marry up the functions so that a user can just supply the path to a .csv and the script will take care of the rest
 ##
 
 ## Create the groups that are needed to add users to. 
-## Check if they exist and only create the ones that don't already
-
+## Check if they exist and only create the ones that don't already. 
+## We'll use the column header as a prefix for that group e.g. "Market - France, Market - Germany, Office - Berlin, Office - Paris"
 
 
 
@@ -50,7 +64,7 @@ def create_groups(groupname):
 	unique_column_values = (datanonnulls[groupname].unique())
 	for group in unique_column_values:
 		if not existing_groups.get(group):
-			payload = {"name":group}
+			payload = {"name":groupname + " - " + group}
 			payloadjson=json.dumps(payload)
 			new_group = sdk.create_group(payloadjson)
 			existing_groups[new_group.name] = new_group.id
@@ -99,5 +113,5 @@ def add_users_to_groups():
 			"Group or User Not Found"
 
 
-add_users_to_groups()
+# add_users_to_groups()
 
