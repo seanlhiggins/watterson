@@ -40,7 +40,8 @@ def create_users(email):
 			new_user = sdk.create_user(payloadjson)
 			existing_users[new_user.email] = new_user.id
 			print("Created New User " + email)
-		print("User " + email + " already exists.")
+		else :
+			print("User " + email + " already exists.")
 
 ## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
 
@@ -65,11 +66,14 @@ def create_groups(groupheadername):
 	unique_column_values = (datanonnulls[groupheadername].unique())
 	for group in unique_column_values:
 		if not existing_groups.get(group):
-			payload = {"name":groupheadername + " - " + group}
-			payloadjson=json.dumps(payload)
-			new_group = sdk.create_group(payloadjson)
-			existing_groups[new_group.name] = new_group.id
-			print("Created New Group " + group)
+			try:
+				payload = {"name":groupheadername + " - " + group}
+				payloadjson=json.dumps(payload)
+				new_group = sdk.create_group(payloadjson)
+				existing_groups[new_group.name] = new_group.id
+				print("Created New Group " + group)
+			except:
+				print("Failed to create " + group)
 		else:
 			print("Group " + group + " already exists")
 
@@ -78,11 +82,14 @@ def update_group_name(groupheadername):
 	for group in unique_column_values:
 		lookergroup = get_group_id_for_group_name(group)
 		for k,v in lookergroup.items():
-			newgroupname = groupheadername + " - " + k 
-			payload = {"name": newgroupname}
-			payloadjson =json.dumps(payload)
-			update_group = sdk.update_group(v, payloadjson)
-			print("Updated " + k + " to " + newgroupname)
+			try:
+				newgroupname = groupheadername + " - " + k 
+				payload = {"name": newgroupname}
+				payloadjson =json.dumps(payload)
+				update_group = sdk.update_group(v, payloadjson)
+				print("Updated " + k + " to " + newgroupname)
+			except:
+				print("Failed to update" + k)
 
 ## Helper function to get the group_id for a supplied group_name.
 ## Output in a dictionary so it can at least reference the right name/id pair.
@@ -114,7 +121,6 @@ def add_users_to_groups():
 		users[email]=office
 
 	for k,v in users.items():
-
 		try:
 			userid = sdk.user_for_credential('email', k)
 			groupnameid = get_group_id_for_group_name(v)
@@ -122,6 +128,7 @@ def add_users_to_groups():
 			payload = {"user_id": userid.id}
 			payloadjson =json.dumps(payload)
 			sdk.add_group_user(groupnameid[v],payloadjson)
+			print("Added user " + k + " to Group " + v)
 		except:
 			"Group or User Not Found"
 
