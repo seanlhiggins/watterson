@@ -7,7 +7,7 @@ import re
 
 # emailheadername = sys.argv[1]
 # groupheadername = sys.argv[2]
-
+groupheadername = 'Team'
 sdk = client.setup('looker.ini')
 
 # First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
@@ -31,14 +31,14 @@ datanonnulls = data.dropna()
 ## - Check if the users exist already, if not, create them - DONE
 
 def create_users(email):
-	existing_users = {user.name: user.id for user in sdk.all_users()}
-	csv_users = (datanotnulls[email].unique())
+	existing_users = {user.email: user.id for user in sdk.all_users()}
+	csv_users = (datanonnulls[email].unique())
 	for email in csv_users:
 		if not existing_users.get(email):
 			payload = {"name": email}
 			payloadjson=json.dumps(payload)
 			new_user = sdk.create_user(payloadjson)
-			existing_groups[new_user.name] = new_user.id
+			existing_users[new_user.email] = new_user.id
 			print("Created New User " + email)
 		print("User " + email + " already exists.")
 
@@ -70,6 +70,8 @@ def create_groups(groupheadername):
 			new_group = sdk.create_group(payloadjson)
 			existing_groups[new_group.name] = new_group.id
 			print("Created New Group " + group)
+		else:
+			print("Group " + group + " already exists")
 
 def update_group_name(groupheadername):
 	unique_column_values = (datanonnulls[groupheadername].unique())
@@ -108,7 +110,7 @@ def add_users_to_groups():
 	create_groups(groupheadername)
 	for i in range(0,data.shape[0]):
 		email = data['Email Address'][i]
-		office = data['Office'][i]
+		office = data['Team'][i]
 		users[email]=office
 
 	for k,v in users.items():
@@ -123,5 +125,6 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-update_group_name('Office')
-
+# update_group_name('Market')
+add_users_to_groups()
+# print(sdk.all_users())
