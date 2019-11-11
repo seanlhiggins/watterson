@@ -22,7 +22,7 @@ for col in data.columns:
 # Get just the email address header name so we can just quickly use it for creating users - DONE
 r=re.compile("(?i).*email*")
 emailheadername = list(filter(r.match,data.columns))[0]
-print (emailheadername)
+
 
 # Remove any rows that have nulls. A bit too intense but works fine for now.
 datanonnulls = data.dropna()
@@ -51,25 +51,36 @@ def create_users(email):
 
 ## - Raise errors for bad formats, header names etc. Just establish a codified .csv format
 ## - Marry up the functions so that a user can just supply the path to a .csv and the script will take care of the rest
-##
+## - Nice to have would be if you wanted to rename a Group. It could be helpful to have regex for the column headers so if there's collision
+# we prompt a rename of the existing group instead of a new one.
 
-## Create the groups that are needed to add users to. 
+## Create the groups that are needed to add users to.  
 ## Check if they exist and only create the ones that don't already. 
 ## We'll use the column header as a prefix for that group e.g. "Market - France, Market - Germany, Office - Berlin, Office - Paris"
 
 
 
-def create_groups(groupname):
+def create_groups(groupheadername):
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
-	unique_column_values = (datanonnulls[groupname].unique())
+	unique_column_values = (datanonnulls[groupheadername].unique())
 	for group in unique_column_values:
 		if not existing_groups.get(group):
-			payload = {"name":groupname + " - " + group}
+			payload = {"name":groupheadername + " - " + group}
 			payloadjson=json.dumps(payload)
 			new_group = sdk.create_group(payloadjson)
 			existing_groups[new_group.name] = new_group.id
 			print("Created New Group " + group)
 
+def update_group_name(groupheadername):
+	unique_column_values = (datanonnulls[groupheadername].unique())
+	for group in unique_column_values:
+		lookergroup = get_group_id_for_group_name(group)
+		for k,v in lookergroup.items():
+			newgroupname = groupheadername + " - " + k 
+			payload = {"name": newgroupname}
+			payloadjson =json.dumps(payload)
+			update_group = sdk.update_group(v, payloadjson)
+			print("Updated " + k + " to " + newgroupname)
 
 ## Helper function to get the group_id for a supplied group_name.
 ## Output in a dictionary so it can at least reference the right name/id pair.
@@ -112,6 +123,5 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-
-# add_users_to_groups()
+update_group_name('Office')
 
