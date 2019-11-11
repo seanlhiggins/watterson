@@ -7,7 +7,7 @@ import re
 
 # emailheadername = sys.argv[1]
 # groupheadername = sys.argv[2]
-groupheadername = 'Team'
+groupheadername = 'Market'
 sdk = client.setup('looker.ini')
 
 # First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
@@ -46,7 +46,7 @@ def create_users(email):
 ## - Import the User Attributes functions. A lot of columns will be used for UAs not Groups
 
 ## - Find more efficient ways to check if the groups and users already exist that doesn't involve
-##   looping through every group and comparing against the all_groups() call - DONE (see create_ functions)
+##   looping through every group and comparing against the all_groups() call 
 
 ## - Set what the expected Column Headers are so we don't need to explicitly set them in the script - PARTIALLY DONE (see column headers at top)
 
@@ -117,11 +117,11 @@ def get_group_id_for_group_name(group_name):
 def add_users_to_groups():
 	users = dict()
 	users_group = dict()
-	create_users(emailheadername)
-	create_groups(groupheadername)
+	# create_users(emailheadername)
+	# create_groups(groupheadername)
 	for i in range(0,data.shape[0]):
-		email = data['Email Address'][i]
-		office = data['Market'][i]
+		email = data[emailheadername][i]
+		office = groupheadername + " - " + data[groupheadername][i]
 		users[email]=office
 
 	for k,v in users.items():
