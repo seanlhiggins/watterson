@@ -63,8 +63,12 @@ def create_users(email):
 
 def create_groups(groupheadername):
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
-	unique_column_values = (datanonnulls[groupheadername].unique())
-	for group in unique_column_values:
+	raw_column_values = (datanonnulls[groupheadername].unique())
+	adjusted_column_values = []
+	for row in raw_column_values:
+		adjusted_column_values.append(groupheadername + " - " + row)
+
+	for group in adjusted_column_values:
 		if not existing_groups.get(group):
 			try:
 				payload = {"name":groupheadername + " - " + group}
@@ -117,7 +121,7 @@ def add_users_to_groups():
 	create_groups(groupheadername)
 	for i in range(0,data.shape[0]):
 		email = data['Email Address'][i]
-		office = data['Team'][i]
+		office = data['Market'][i]
 		users[email]=office
 
 	for k,v in users.items():
@@ -132,6 +136,6 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-# update_group_name('Market')
+# update_group_name('Team')
 add_users_to_groups()
 # print(sdk.all_users())
