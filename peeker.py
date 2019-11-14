@@ -14,22 +14,7 @@ app.config.from_pyfile('config.py')
 groupheadername = 'Market'
 sdk = client.setup('looker.ini')
 
-# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
-data = pd.read_csv("examplelookerusers.csv") 
-data.head()
 
-# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
-csvcolumnheaders = []
-for col in data.columns:
-	csvcolumnheaders.append(col)
-
-# Get just the email address header name so we can just quickly use it for creating users - DONE
-r=re.compile("(?i).*email*")
-emailheadername = list(filter(r.match,data.columns))[0]
-
-
-# Remove any rows that have nulls. A bit too intense but works fine for now.
-datanonnulls = data.dropna()
 
 # TODO: preliminary checks - 
 ## - Check if the users exist already, if not, create them - DONE
@@ -144,10 +129,27 @@ def add_users_to_groups():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    if request.method == 'POST':
-        df = pd.read_csv(request.files.get('file'))
-        return render_template('upload.html', shape=df.shape, columns=csvcolumnheaders)
-    return render_template('upload.html')
+	if request.method == 'POST':
+
+		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
+		data = pd.read_csv(request.files.get('file'))
+		data.head()
+
+		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
+		csvcolumnheaders = []
+		for col in data.columns:
+			csvcolumnheaders.append(col)
+
+		# Get just the email address header name so we can just quickly use it for creating users - DONE
+		r=re.compile("(?i).*email*")
+		emailheadername = list(filter(r.match,data.columns))[0]
+
+
+		# Remove any rows that have nulls. A bit too intense but works fine for now.
+		datanonnulls = data.dropna()
+
+		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=datanonnulls.to_html)
+	return render_template('upload.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
