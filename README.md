@@ -16,3 +16,4 @@ A later iteration will also incorporate Groups. Again the portal will read the h
 
 <b>Update (10/11/19)</b>: Did a bit of cleanup, prepped some stuff via Pandas so the eventual UI will have what it needs to construct an interface for selection of columns etc. Added a bunch of TODOs to keep a breadcrumb trail and keep focus on what's needed next.
 
+<b>Update (14/11/19)</b>: Using Flask to make a simple app with UI for uploading csv, cleaned up some references, removed hardcoded stuff. Nothing fancy. 
