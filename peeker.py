@@ -2,9 +2,13 @@ import pandas as pd
 import json
 import sys
 import numpy as np
+from flask import Flask, request, render_template
 from looker_sdk import client, models
 import re
 
+app = Flask(__name__)
+app.config.from_object('config')
+app.config.from_pyfile('config.py')
 # emailheadername = sys.argv[1]
 # groupheadername = sys.argv[2]
 groupheadername = 'Market'
@@ -136,6 +140,14 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-# update_group_name('Team')
-add_users_to_groups()
-# print(sdk.all_users())
+
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if request.method == 'POST':
+        df = pd.read_csv(request.files.get('file'))
+        return render_template('upload.html', shape=df.shape, columns=csvcolumnheaders)
+    return render_template('upload.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)
