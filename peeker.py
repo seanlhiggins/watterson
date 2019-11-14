@@ -146,8 +146,8 @@ def upload():
 
 		# Remove any rows that have nulls. A bit too intense but works fine for now.
 		datanonnulls = data.dropna()
-		htmltable = datanonnulls.to_html(classes=)
-		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=htmltable)
+		html = datanonnulls.to_html(max_rows=20,border=10)
+		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=html)
 	return render_template('upload.html')
 
 if __name__ == '__main__':
