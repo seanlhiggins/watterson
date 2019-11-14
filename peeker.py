@@ -133,7 +133,6 @@ def upload():
 
 		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
 		data = pd.read_csv(request.files.get('file'))
-		data.head()
 
 		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
 		csvcolumnheaders = []
@@ -147,8 +146,8 @@ def upload():
 
 		# Remove any rows that have nulls. A bit too intense but works fine for now.
 		datanonnulls = data.dropna()
-
-		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=datanonnulls.to_html)
+		htmltable = datanonnulls.to_html(classes=)
+		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=htmltable)
 	return render_template('upload.html')
 
 if __name__ == '__main__':

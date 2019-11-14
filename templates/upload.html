@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='stylesheet.css') }}"/>
+
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
@@ -11,5 +13,7 @@
 </form>
 Shape is: {{ shape }}
 Columns are: {{ columns }}
+
+CSV Table: {{ table }}
 </body>
 </html>
