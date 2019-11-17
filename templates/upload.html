@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style>
-     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
-</style>
+<!-- <style>
+	table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+    border-color: grey;
+}
+</style> -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
@@ -12,10 +19,42 @@
     <input type=file name=file>
     <input type=submit value=Upload>
 </form>
-Shape is: {{ shape }}
-Columns are: {{ columns }}
 
-CSV Table: 
-{{ table|safe }}
+<div id="auth">
+	<form >
+	  Host:<br>
+	  <input type="text" name="host">
+	  <br>
+	  Client ID:<br>
+	  <input type="text" name="clientid">
+	  <br>
+	  Client Secret:<br>
+	  <input type="text" name="clientsecret">
+	</form> 
+</div>
+<br>
+<br>
+<div id="uploadedcsv">
+CSV Headers: 
+	<div id="table">
+		<table class="table table-bordered table-hover table-condensed">
+			<th>Field Name</th>
+			<th>Create As</th>
+			<th>Default Value</th>
+			<th>Create Group?</th>
+			<th>Create User Attribute?</th>
+	{% for header in columns %}
+	  	<tr>
+	  		<td><input type="text" id="fname1" size="15" value={{header}} title="Type:I,Counts: Total Records: 672,Empty Records:1"></td>
+			<td><select id="ftype1" title="Choose whether you wish to create a Group or User Attribute"><option value="GRP" {vc1}="">Group</option><option value="UA" {vc1}="">User Attribute</option></select>
+	  		<td><input type="text" id="uadefault" size="15" title="User Attribute default value"></td>
+			<td><input type="checkbox" id="chkupper1" value="Y" onclick="if(this.checked)document.getElementById('chklower1').checked=false"></td>
+			<td><input type="checkbox" id="chkupper1" value="Y" onclick="if(this.checked)document.getElementById('chklower1').checked=false"></td>
+		</tr>
+	{% endfor %}
+		</table>
+	</div>
+</div>
+<br>
 </body>
 </html>
