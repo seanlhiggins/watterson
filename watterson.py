@@ -150,5 +150,10 @@ def upload():
 		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=html)
 	return render_template('upload.html')
 
+@app.route('/process', methods=['GET', 'POST'])
+def process():
+	return render_template('process.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
