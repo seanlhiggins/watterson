@@ -9,15 +9,17 @@
     border-color: grey;
 }
 </style> -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
 	
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 <body>
 <form method=post enctype=multipart/form-data>
     <input type=file name=file>
-    <input type=submit value=Upload>
+    <input type=submit class ="btn btn-primary" value=Upload>
 </form>
 
 <div id="auth">
