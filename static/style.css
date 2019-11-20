@@ -1,13 +1,33 @@
 html {
-      background: #018DED url(http://i.imgur.com/b9r5sEL.jpg);
-      background-size: cover;
-      font-family: 'helvetica neue';
-      text-align: center;
-      font-size: 10px;
-    }
-table {
-  border-collapse: collapse;
-  width: 100%;
+  /*background: #018DED url(http://i.imgur.com/b9r5sEL.jpg);*/
+  background-size: cover;
+  font-family: "Open Sans","Noto Sans JP","Noto Sans","Noto Sans CJK KR",Helvetica,Arial,sans-serif;
+  text-align: center;
+  font-size: 12px;
+}
+
+.table, .looker-flavored-markdown table:not(.lk-vis-table) {
+    width: 60%;
+    margin-bottom: 18px;
+    align-items: center;
+    float: center;
+}
+
+/*.table.table-striped th, .looker-flavored-markdown table.table-striped:not(.lk-vis-table) th {
+    background: transparent;
+    color: #696969;
+    border-bottom: 1px solid #e4e5e6;
+    margin-bottom: 10px;
+    border-spacing: 0;
+}*/
+
+body {
+  text-align: center;
+  background: #fff;
+  color: #a2a3a4;
+  font-family: "Open Sans","Noto Sans JP","Noto Sans","Noto Sans CJK KR",Helvetica,Arial,sans-serif;
+  font-weight: 100;
+  font-size: 12px;
 }
 
 th, td {
@@ -15,7 +35,15 @@ th, td {
   padding: 8px;
 }
 
-tr:nth-child(even) {background-color: #f2f2f2;}
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+    border-top-color: inherit;
+    border-right-color: inherit;
+    border-bottom-color: inherit;
+    border-left-color: inherit;
+}
 
 .btn-primary {
     color: #fff;

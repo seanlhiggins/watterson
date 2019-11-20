@@ -38,13 +38,16 @@
 <br>
 <div id="uploadedcsv">
 CSV Headers: 
-	<div id="table">
-		<table class="table table-bordered table-hover table-condensed">
+	<div id="lk-content">
+		<table class="table table-striped users-table" style="float: center">
+			<thead>
 			<th>Field Name</th>
 			<th>Create As</th>
 			<th>Default Value</th>
 			<th>Create Group?</th>
 			<th>Create User Attribute?</th>
+		</thead>
+		<tbody>
 	{% for header in columns %}
 	  	<tr>
 	  		<td><input type="text" id="fname1" size="15" value={{header}} title="Type:I,Counts: Total Records: 672,Empty Records:1"></td>
@@ -54,6 +57,9 @@ CSV Headers:
 			<td><input type="checkbox" id="chkupper1" value="Y" onclick="if(this.checked)document.getElementById('chklower1').checked=false"></td>
 		</tr>
 	{% endfor %}
+			</td>
+
+	</tbody>
 		</table>
 	</div>
 </div>
