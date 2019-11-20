@@ -1,14 +1,6 @@
-html {
-  /*background: #018DED url(http://i.imgur.com/b9r5sEL.jpg);*/
-  background-size: cover;
-  font-family: "Open Sans","Noto Sans JP","Noto Sans","Noto Sans CJK KR",Helvetica,Arial,sans-serif;
-  text-align: center;
-  font-size: 12px;
-}
-
-.table, .looker-flavored-markdown table:not(.lk-vis-table) {
+.table {
     width: 60%;
-    margin-bottom: 18px;
+    margin-bottom: 1px;
     align-items: center;
     float: center;
 }
@@ -31,8 +23,8 @@ body {
 }
 
 th, td {
-  text-align: left;
-  padding: 8px;
+  text-align: center;
+  padding: 1px;
 }
 
 tr {
@@ -50,4 +42,9 @@ tr {
     background: #64518A;
     border: 1px solid #64518A;
     margin-left: 12px;
+}
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
 }

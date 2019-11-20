@@ -50,7 +50,7 @@ CSV Headers:
 		<tbody>
 	{% for header in columns %}
 	  	<tr>
-	  		<td><input type="text" id="fname1" size="15" value={{header}} title="Type:I,Counts: Total Records: 672,Empty Records:1"></td>
+	  		<td><input type="text" id="fieldname" size="15" value={{header}}></td>
 			<td><select id="ftype1" title="Choose whether you wish to create a Group or User Attribute"><option value="GRP" {vc1}="">Group</option><option value="UA" {vc1}="">User Attribute</option></select>
 	  		<td><input type="text" id="uadefault" size="15" title="User Attribute default value"></td>
 			<td><input type="checkbox" id="chkupper1" value="Y" onclick="if(this.checked)document.getElementById('chklower1').checked=false"></td>
