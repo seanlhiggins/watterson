@@ -7,6 +7,13 @@
 
 </head>
 <body>
+
+<div class="topnav">
+  <a class="active" href="home">Watterson</a>
+  <a class="active" >A CSV upload page for Looker user management</a>
+
+</div>
+
 <form method=post enctype=multipart/form-data>
     <input type=file name=file>
     <input type=submit class ="btn btn-primary" value=Upload>
@@ -48,13 +55,14 @@ CSV Headers:
 		</tr>
 	{% endfor %}
 			</td>
-<form method=POST action="/process">
-	    <input type=submit class ="btn btn-primary" value=Submit>
 
-</form>
-	</tbody>
-		</table>
+		</tbody>
+	</table>
+
 	</div>
+	<form method=POST action="/process">
+	<input type=submit class ="btn btn-primary" value=Submit>
+</form>
 </div>
 <br>
 </body>
