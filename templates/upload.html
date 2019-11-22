@@ -1,16 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<!-- <style>
-	table {
-    display: table;
-    border-collapse: separate;
-    border-spacing: 2px;
-    border-color: grey;
-}
-</style> -->
-<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-	
+<head>	
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -53,12 +43,15 @@ CSV Headers:
 	  		<td><input type="text" id="fieldname" size="15" value={{header}}></td>
 			<td><select id="ftype1" title="Choose whether you wish to create a Group or User Attribute"><option value="GRP" {vc1}="">Group</option><option value="UA" {vc1}="">User Attribute</option></select>
 	  		<td><input type="text" id="uadefault" size="15" title="User Attribute default value"></td>
-			<td><input type="checkbox" id="chkupper1" value="Y" onclick="if(this.checked)document.getElementById('chklower1').checked=false"></td>
-			<td><input type="checkbox" id="chkupper1" value="Y" onclick="if(this.checked)document.getElementById('chklower1').checked=false"></td>
+			<td><input type="checkbox" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false"></td>
+			<td><input type="checkbox" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
 		</tr>
 	{% endfor %}
 			</td>
+<form method=POST action="/process">
+	    <input type=submit class ="btn btn-primary" value=Submit>
 
+</form>
 	</tbody>
 		</table>
 	</div>
