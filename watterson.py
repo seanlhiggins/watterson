@@ -5,6 +5,7 @@ import numpy as np
 from flask import Flask, request, render_template
 from looker_sdk import client, models
 import re
+import requests
 
 app = Flask(__name__)
 app.config.from_object('config')
@@ -152,7 +153,8 @@ def upload():
 
 @app.route('/process', methods=['GET', 'POST'])
 def process():
-	return render_template('process.html')
+	data = request.form['usersend']
+	return render_template('process.html', data=data)
 
 
 if __name__ == '__main__':
