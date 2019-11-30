@@ -51,29 +51,32 @@ CSV Headers:
 		</thead>
 		<tbody>
 <!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
+
+	<form  method=POST action="/process">
 	{% for header in columns %}
 	  	<tr>
-	  		<td><input type="text" id="fieldname{{loop.index}}" size="15" value={{header}}></td>
+	  		<td><input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}}></td>
 
-			<td><select id="ftype{{loop.index}}" title="Choose whether you wish to create a Group or User Attribute"><option value="GRP" {vc1}="">Group</option><option value="UA" {vc1}="">User Attribute</option></select>
+			<td><select name="ftype{{loop.index}}" id="ftype{{loop.index}}" title="Choose whether you wish to create a Group or User Attribute"><option value="GRP" {vc1}="">Group</option><option value="UA" {vc1}="">User Attribute</option></select>
 	  		
-	  		<td><input type="text" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
+	  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
 			
-			<td><input type="checkbox" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false"></td>
+			<td><input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false"></td>
 			
-			<td><input type="checkbox" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
+			<td><input type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
 		</tr>
 	{% endfor %}
-			</td>
+		<input type=submit class ="btn btn-primary" value=Submit>
+	</form>
+
 
 		</tbody>
 	</table>
 
 	</div>
-	<form id='usersend' method=POST action="/process">
+<!-- 	<form id='usersend' method=POST action="/process">
 		<input type="text" name='usersend' id='userattributeinput'>
-		<input type=submit class ="btn btn-primary" value=Submit>
-	</form>
+	</form> -->
 </div>
 <br>
 </body>

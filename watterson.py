@@ -153,8 +153,9 @@ def upload():
 
 @app.route('/process', methods=['GET', 'POST'])
 def process():
-	data = request.form['usersend']
-	return render_template('process.html', data=data)
+	ua_default = request.form['uadefault1']
+	data = request.form['fieldname1']
+	return render_template('process.html', ua_default=ua_default,fieldname1=data)
 
 
 if __name__ == '__main__':
