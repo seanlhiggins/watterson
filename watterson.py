@@ -154,9 +154,8 @@ def upload():
 @app.route('/process', methods=['GET', 'POST'])
 def process():
 	user_attribute_pairs = {}
-	list_of_fields_to_be_user_attributes = []
-	list_of_fields_to_be_user_attributes.append(request.files.get('fieldname'))
-
+	keys = request.form.keys()
+	list_of_fields_to_be_user_attributes = [key for key in keys if key.startswith("fieldname")]
 	checklist = request.form.getlist('chkcreateuseratt1')
 	for field in list_of_fields_to_be_user_attributes:
 		if checklist:
