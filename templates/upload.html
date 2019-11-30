@@ -6,10 +6,13 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
-<script type="">
-	var inputOne = $("#uadefault1");
-	var inputTwo = $("#userattributeinput");
-	inputTwo.val(inputOne.val());
+<script>
+function disableText() {
+    var x = document.getElementById("ftype").value;
+    if(x == "GRP"){
+       document.getElementById("uadefault").disabled=true;
+    }
+}
 </script>
 <body>
 
@@ -57,9 +60,17 @@ CSV Headers:
 	  	<tr>
 	  		<td><input type="text" name="fieldname{{loop.index}}" id="fieldname" size="15" value={{header}} ></td>
 
-			<td><select name="ftype{{loop.index}}" id="ftype" title="Choose whether you wish to create a Group or User Attribute" onchange="if(this.value='User Attribute')document.getElementById('uadefault{{loop.index}}').disabled=true"><option value="GRP" {vc1}="">Group</option><option value="UA" {vc1}="">User Attribute</option></select>
-	  		
-	  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault1" size="15" title="User Attribute default value"></td>
+			<td>
+				<select name="ftype{{loop.index}}" id="ftype" 
+				onchange="disableText()"
+				>
+				<option value="">Select</option>
+				<option value="UA">User Attribute</option>
+				<option value="GRP">Group</option>
+				</select>
+	  		</td>
+
+	  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault" size="15" title="User Attribute default value"></td>
 			
 			<td><input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false"></td>
 			

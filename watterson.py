@@ -155,10 +155,15 @@ def upload():
 def process():
 	user_attribute_pairs = {}
 	list_of_fields_to_be_user_attributes = []
+	list_of_fields_to_be_user_attributes.append(request.files.get('fieldname'))
+
+	checklist = request.form.getlist('chkcreateuseratt1')
 	for field in list_of_fields_to_be_user_attributes:
-		user_attribute_pairs['field'] = request.form.getlist('uadefault1')
+		if checklist:
+			user_attribute_pairs[field] = request.form.getlist('uadefault1')
+
 	data = request.form['fieldname1']
-	return render_template('process.html', ua_default=user_attribute_pairs,fieldname1=data)
+	return render_template('process.html', ua_default=user_attribute_pairs,fieldname1=data, checklist=checklist)
 
 
 if __name__ == '__main__':
