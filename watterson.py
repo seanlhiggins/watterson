@@ -153,9 +153,12 @@ def upload():
 
 @app.route('/process', methods=['GET', 'POST'])
 def process():
-	ua_default = request.form['uadefault1']
+	user_attribute_pairs = {}
+	list_of_fields_to_be_user_attributes = []
+	for field in list_of_fields_to_be_user_attributes:
+		user_attribute_pairs['field'] = request.form.getlist('uadefault1')
 	data = request.form['fieldname1']
-	return render_template('process.html', ua_default=ua_default,fieldname1=data)
+	return render_template('process.html', ua_default=user_attribute_pairs,fieldname1=data)
 
 
 if __name__ == '__main__':
