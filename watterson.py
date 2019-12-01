@@ -126,6 +126,15 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
+class FormRow():
+
+    def __init__(self, fname, ftype, uadefault, grp, ua):
+        """Constructor"""
+        self.fname = fname
+        self.ftype = ftype
+        self.uadefault = uadefault
+        self.grp = grp
+        self.ua = ua
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -153,19 +162,29 @@ def upload():
 
 @app.route('/process', methods=['GET', 'POST'])
 def process():
-	user_attribute_pairs = {}
-	keys = request.form.keys()
-	kv = request.form.items()
-	for k,v in kv:
-		print(k,v)
-	list_of_fields_to_be_user_attributes = [key for key in keys if key.startswith("fieldname")]
-	checklist = request.form.getlist('chkcreateuseratt1')
-	for field in list_of_fields_to_be_user_attributes:
-		if checklist:
-			user_attribute_pairs[field] = request.form.getlist('uadefault1')
+	formelements = []
+	formelements.append(request.form.items())
 
-	data = request.form['fieldname1']
-	return render_template('process.html', ua_default=user_attribute_pairs,fieldname1=data, checklist=checklist, kv=kv)
+# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form
+	csvcolumnheaders=8
+	listofentries = []
+	for element in formelements:
+		i=0
+		while i<=csvcolumnheaders:
+			nameofrow = request.form.get("fieldname{}".format(i))
+			datatype = request.form.get("ftype{}".format(i))
+			uadefault = request.form.get("uadefault{}".format(i))
+			groupyesno = request.form.get("chkcreategroup{}".format(i))
+			uayesno = request.form.get("chkcreateuseratt{}".format(i))
+			i+=1
+			print(nameofrow,datatype,uadefault,groupyesno,uayesno)
+			row_i = FormRow(nameofrow,datatype,uadefault,groupyesno,uayesno)
+			listofentries.append(row_i)			
+	if(listofentries.grp = 'Y'):
+		create_groups(listofentries.nameofrow)
+
+
+	return render_template('process.html', ua_default=listofentries)
 
 
 if __name__ == '__main__':
