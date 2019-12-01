@@ -6,7 +6,18 @@
 <head>
 
 </head>
-Form has been uploaded - {{ fieldname1 }} {{ ua_default }} {{ checklist }}
+Form has been uploaded - {{ fieldname1 }} {{ ua_default }} {{ checklist }} 
+
+<br>
+
+<h1>Summary</h1>
+{% for items in kv %}
+	{{kv}}
+	<p>{{items}}</p>
+	<p>Key: {{k}}</p>
+    <p>Value: {{v}}</p>
+
+{% endfor %}
 <body>
 </body>
 </html>
