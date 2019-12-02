@@ -95,11 +95,13 @@ CSV Headers:
 <br>
 
 <h3>Uploaded data:</h3>
-<div style="border:1px solid black;height:200px;width:70%;overflow-y:hidden;overflow-x:scroll;">
-	<p style="width:250%;">
-		{{ csv }}
-	</p>
+<div id="pandastable">
+
+		{{ table | safe }}
+
 </div>
+
+
 
 </body>
 </html>

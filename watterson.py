@@ -214,7 +214,7 @@ def upload_file():
 			# Remove any rows that have nulls. A bit too intense but works fine for now.
 			global datawithoutnulls
 			datawithoutnulls = data.dropna()
-			html = datawithoutnulls.to_html(max_rows=20,border=10)
+			html = datawithoutnulls.to_html(max_rows=20)
 			return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
 
 		elif request.form['action']  == "Process":
