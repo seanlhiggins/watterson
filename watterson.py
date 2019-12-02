@@ -81,6 +81,7 @@ def create_groups(groupheadername):
 				print("Failed to create " + group)
 		else:
 			print("Group " + group + " already exists")
+	return adjusted_column_values
 
 def update_group_name(groupheadername):
 	unique_column_values = (datanonnulls[groupheadername].unique())
@@ -197,8 +198,7 @@ def process():
 
 			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
 			if row_i.grp == 'Y':
-				create_groups(fname)
-				groups_created.append(fname)
+				groups_created.append(create_groups(fname))
 
 
 	return render_template('process.html', groups=groups_created)

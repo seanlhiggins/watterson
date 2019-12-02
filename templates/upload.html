@@ -22,12 +22,12 @@ function disableText() {
 </script>
 <body>
 
+{% block topbar %}
 <div class="topnav">
   <a class="active" href="home">Watterson</a>
   <a class="active" >A CSV upload page for Looker user management</a>
-
 </div>
-
+{% endblock %}
 <form method=post enctype=multipart/form-data>
     <input type=file name=file>
     <input type=submit class ="btn btn-primary" value=Upload>
