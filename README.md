@@ -19,3 +19,5 @@ A later iteration will also incorporate Groups. Again the portal will read the h
 <b>Update (14/11/19)</b>: Using Flask to make a simple app with UI for uploading csv, cleaned up some references, removed hardcoded stuff. Nothing fancy. 
 
 <b>Update (18/11/19)</b>: Made the basic UI. Renamed app. Start putting together front end functions. 
+
+<b>Update (2/12/19)</b>: Handled the form inputs, made the elements dynamic, create the landing page for summarising the actions, linked up the form to the original functions that do the lifting. A bit messy and cluttered right now to just make it work, but it does what I planned for now. Next I'll make the functions more succinct, the UI a bit nicer, account for bad calls etc. 

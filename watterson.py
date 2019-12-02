@@ -166,31 +166,36 @@ def upload():
 
 @app.route('/process', methods=['GET', 'POST'])
 def process():
+	
+	# Get everything a user sends in the form
+
 	formelements = []
 	formelements.append(request.form.items())
 
-# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form
+	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form - DONE with a global variable. Yuck.
+
 	global datawithoutnulls
 	csvcolumnheaders=len(datawithoutnulls.columns)
-
+	
+	# With everything the user's given us, tie all the form rows together in objects so they can be handled discretely e.g. if not checked do X, if checked do Y etc.
 	listofentries = []
 	for element in formelements:
 		i=0
 		while i<=csvcolumnheaders:
+
+			# Have to do this weird formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
 			fname = request.form.get("fieldname{}".format(i))
 			ftype = request.form.get("ftype{}".format(i))
 			uadefault = request.form.get("uadefault{}".format(i))
 			grp = request.form.get("chkcreategroup{}".format(i))
 			ua = request.form.get("chkcreateuseratt{}".format(i))
-
 			i+=1
+
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 			listofentries.append(row_i)			
+			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
 			if row_i.grp == 'Y':
 				create_groups(fname)
-
-
-
 
 	return render_template('process.html', ua_default=listofentries[1])
 
