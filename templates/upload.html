@@ -28,7 +28,7 @@ function disableText() {
   <a class="active" >A CSV upload page for Looker user management</a>
 </div>
 {% endblock %}
-<form method=post enctype=multipart/form-data>
+<form method=post action="" enctype=multipart/form-data>
     <input type=file name=file>
     <input type=submit class ="btn btn-primary" name="action" value="Upload">
 </form>
@@ -82,7 +82,7 @@ CSV Headers:
 			<td><input type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
 		</tr>
 	{% endfor %}
-		<input type=submit class ="btn btn-primary" name="action" value="Process">
+		<input type=submit class="btn btn-primary" name="action" value="Process">
 	</form>
 
 

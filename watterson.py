@@ -189,35 +189,36 @@ def upload():
 def upload_file():
 	file = None
 	data = None
-	if request.form['action'] == 'Upload':
+	if request.method == 'POST':
+		if request.form['action'] == 'Upload':
 
-		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
-		file = request.files.get('file')
-		if file and allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			
-		data = pd.read_csv(request.files.get('file'))
+			# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
+			data = pd.read_csv(request.files.get('file'))
+			file = request.files.get('file')
+			print(file)
+			if file and allowed_file(file.filename):
+				filename = secure_filename(file.filename)
+				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename+'s'))
+				
 
-		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
-		csvcolumnheaders = []
-		for col in data.columns:
-			csvcolumnheaders.append(col)
+			# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
+			csvcolumnheaders = []
+			for col in data.columns:
+				csvcolumnheaders.append(col)
 
-		# Get just the email address header name so we can just quickly use it for creating users - DONE
-		r=re.compile("(?i).*email*")
-		emailheadername = list(filter(r.match,data.columns))[0]
+			# Get just the email address header name so we can just quickly use it for creating users - DONE
+			r=re.compile("(?i).*email*")
+			emailheadername = list(filter(r.match,data.columns))[0]
 
 
-		# Remove any rows that have nulls. A bit too intense but works fine for now.
-		global datawithoutnulls
-		datawithoutnulls = data.dropna()
-		html = datawithoutnulls.to_html(max_rows=20,border=10)
-		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
+			# Remove any rows that have nulls. A bit too intense but works fine for now.
+			global datawithoutnulls
+			datawithoutnulls = data.dropna()
+			html = datawithoutnulls.to_html(max_rows=20,border=10)
+			return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
 
-	if request.form['action']  == "Process":
-		return redirect(url_for('process',
-	                                    filename=filename))
+		elif request.form['action']  == "Process":
+			return redirect(url_for('process',filename=file))
 	return render_template('upload.html')
 
 @app.route('/process/<filename>', methods=['GET', 'POST'])
