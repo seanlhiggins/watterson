@@ -61,7 +61,7 @@ CSV Headers:
 		<tbody>
 <!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
 
-	<form  method=POST action="/process">
+	<form  method=POST action="">
 	{% for header in columns %}
 	  	<tr>
 	  		<td><input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} ></td>
@@ -82,7 +82,7 @@ CSV Headers:
 			<td><input type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
 		</tr>
 	{% endfor %}
-		<input id="csv" name="csv" type="hidden" value="{{csv}}">
+		<input id="csv" name="csv" type="hidden" value="{{data}}">
 
 		<input type=submit class="btn btn-primary" name="action" value="Process File">
 	</form>

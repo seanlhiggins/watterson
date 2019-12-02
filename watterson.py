@@ -2,7 +2,7 @@ import pandas as pd
 import json
 import sys
 import numpy as np
-from flask import Flask, request, render_template, send_from_directory,redirect, url_for
+from flask import Flask, request, render_template, send_from_directory,redirect, url_for, session
 from looker_sdk import client, models
 import re
 import requests
@@ -182,6 +182,7 @@ def upload_file():
 		data = pd.read_csv(request.files.get('file'))
 		file = request.files.get('file')
 
+
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -201,9 +202,7 @@ def upload_file():
 		global datawithoutnulls
 		datawithoutnulls = data.dropna()
 		html = datawithoutnulls.to_html(max_rows=20)
-		return render_template('uploaded_file.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
-		# First, redirect to the 
-		# return redirect(url_for('upload',filename=filename))
+		return redirect(url_for('process', filename=filename))
 
 
 	return render_template('upload.html')
@@ -211,14 +210,16 @@ def upload_file():
 
 
 
-@app.route('/process', methods=['GET', 'POST'])
+@app.route('/process/<filename>', methods=['GET', 'POST'])
 def process():
 	# Can't access the global unless it's been assigned in scope, even if it's reassigned from another route seemingly
 	# global datawithoutnulls 
 
-	datastringify = StringIO(request.form['csv'])
-	data = pd.read_csv(datastringify,sep=",")
-	print(data)
+
+
+
+
+	print(filename)
 	global datawithoutnulls
 	datawithoutnulls = data.dropna()
 	# Get everything a user sends in the form
@@ -238,9 +239,10 @@ def process():
 	user_attributes_created =[]
 	usergroupscreated = None
 	r=re.compile("(?i).*email*")
-	emailheadername = list(filter(r.match,data.columns))[0]
+	# emailheadername = list(filter(r.match,data.columns))[0]
+	emailheadername = 'Email'
 	print(f"email header - {emailheadername}")
-
+	html_table = data.to_html(max_rows=20)
 	for element in formelements:
 		i=0
 		while i<=csvcolumnheaders:
@@ -258,16 +260,16 @@ def process():
 			listofentries.append(row_i)	
 
 			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
-			if row_i.grp == 'Y':
-				usergroupscreated = add_users_to_groups(emailheadername,fname)
-				# groups_created.append(create_groups(fname))
-				# users_created.append(create_users(emailheadername))
+			# if row_i.grp == 'Y':
+			# 	usergroupscreated = add_users_to_groups(emailheadername,fname)
+
+				
 
 
 
 	return render_template('process.html', 
-							# groups=usergroupscreated, 
-							data=data)
+
+							data=html_table)
 	# return send_from_directory(app.config['UPLOAD_FOLDER'],
                                # filename)
 
