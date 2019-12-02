@@ -9,6 +9,7 @@ import requests
 import urllib3
 from werkzeug.utils import secure_filename
 import os
+from io import StringIO
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -169,71 +170,63 @@ def add_users_to_groups(emailheader, groupheader):
 	return "Groups Created - {}. Users created - {}".format(groups_created, [x for x in useremails])
 
 
-@app.route('/home', methods=['GET','POST'])
-def upload():
-	# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
-	if request.method == 'POST':
-
-		file = request.files.get('file')
-		data = pd.read_csv(request.files.get('file'))
-
-		if file and allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			return render_template('upload.html', csv=data)
-
-	return render_template('upload.html')
-
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
 	file = None
-	data = None
+	data = []
+
 	if request.method == 'POST':
-		if request.form['action'] == 'Upload':
 
-			# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
-			data = pd.read_csv(request.files.get('file'))
-			file = request.files.get('file')
-			print(file)
-			if file and allowed_file(file.filename):
-				filename = secure_filename(file.filename)
-				file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename+'s'))
-				
+		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
+		data = pd.read_csv(request.files.get('file'))
+		file = request.files.get('file')
 
-			# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
-			csvcolumnheaders = []
-			for col in data.columns:
-				csvcolumnheaders.append(col)
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			# return redirect(url_for('process',filename=filename, csv=data))	
 
-			# Get just the email address header name so we can just quickly use it for creating users - DONE
-			r=re.compile("(?i).*email*")
-			emailheadername = list(filter(r.match,data.columns))[0]
+		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
+		csvcolumnheaders = []
+		for col in data.columns:
+			csvcolumnheaders.append(col)
+
+		# Get just the email address header name so we can just quickly use it for creating users - DONE
+		r=re.compile("(?i).*email*")
+		emailheadername = list(filter(r.match,data.columns))[0]
 
 
-			# Remove any rows that have nulls. A bit too intense but works fine for now.
-			global datawithoutnulls
-			datawithoutnulls = data.dropna()
-			html = datawithoutnulls.to_html(max_rows=20)
-			return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
+		# Remove any rows that have nulls. A bit too intense but works fine for now.
+		global datawithoutnulls
+		datawithoutnulls = data.dropna()
+		html = datawithoutnulls.to_html(max_rows=20)
+		return render_template('uploaded_file.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
+		# First, redirect to the 
+		# return redirect(url_for('upload',filename=filename))
 
-		elif request.form['action']  == "Process":
-			return redirect(url_for('process',filename=file))
+
 	return render_template('upload.html')
 
-@app.route('/process/<filename>', methods=['GET', 'POST'])
-def process(filename):
+
+
+
+@app.route('/process', methods=['GET', 'POST'])
+def process():
+	# Can't access the global unless it's been assigned in scope, even if it's reassigned from another route seemingly
+	# global datawithoutnulls 
+
+	datastringify = StringIO(request.form['csv'])
+	data = pd.read_csv(datastringify,sep=",")
+	print(data)
 	global datawithoutnulls
-
-	data = pd.read_csv('{}/{}'.format(app.config['UPLOAD_FOLDER'],filename))
-
-
+	datawithoutnulls = data.dropna()
 	# Get everything a user sends in the form
 
 	formelements = []
 	formelements.append(request.form.items())
 
-	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form - DONE with a global variable. Yuck.
+	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form 
 
 	csvcolumnheaders=8
 	# len(datawithoutnulls.columns)
@@ -246,13 +239,13 @@ def process(filename):
 	usergroupscreated = None
 	r=re.compile("(?i).*email*")
 	emailheadername = list(filter(r.match,data.columns))[0]
+	print(f"email header - {emailheadername}")
 
-	emailheadername='email'
 	for element in formelements:
 		i=0
 		while i<=csvcolumnheaders:
 
-			# Have to do this weird formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
+			# Have to do this  formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
 			fname = request.form.get("fieldname{}".format(i))
 			ftype = request.form.get("ftype{}".format(i))
 			uadefault = request.form.get("uadefault{}".format(i))
@@ -260,6 +253,7 @@ def process(filename):
 			ua = request.form.get("chkcreateuseratt{}".format(i))
 			i+=1
 
+			# Create an object to store all the form values row-wise for concurrent handling
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 			listofentries.append(row_i)	
 
@@ -271,7 +265,9 @@ def process(filename):
 
 
 
-	return render_template('process.html', groups=usergroupscreated)
+	return render_template('process.html', 
+							# groups=usergroupscreated, 
+							data=data)
 	# return send_from_directory(app.config['UPLOAD_FOLDER'],
                                # filename)
 
