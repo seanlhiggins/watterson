@@ -30,7 +30,7 @@ function disableText() {
 {% endblock %}
 <form method=post enctype=multipart/form-data>
     <input type=file name=file>
-    <input type=submit class ="btn btn-primary" value=Upload>
+    <input type=submit class ="btn btn-primary" name="action" value="Upload">
 </form>
 
 <div id="auth">
@@ -82,7 +82,7 @@ CSV Headers:
 			<td><input type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
 		</tr>
 	{% endfor %}
-		<input type=submit class ="btn btn-primary" value=Submit>
+		<input type=submit class ="btn btn-primary" name="action" value="Process">
 	</form>
 
 
@@ -93,5 +93,13 @@ CSV Headers:
 
 </div>
 <br>
+
+<h3>Uploaded data:</h3>
+<div style="border:1px solid black;height:200px;width:70%;overflow-y:hidden;overflow-x:scroll;">
+	<p style="width:250%;">
+		{{ csv }}
+	</p>
+</div>
+
 </body>
 </html>

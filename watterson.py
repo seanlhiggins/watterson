@@ -169,19 +169,34 @@ def add_users_to_groups(emailheader, groupheader):
 	return "Groups Created - {}. Users created - {}".format(groups_created, [x for x in useremails])
 
 
+@app.route('/home', methods=['GET','POST'])
+def upload():
+	# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
+	if request.method == 'POST':
+
+		file = request.files.get('file')
+		data = pd.read_csv(request.files.get('file'))
+
+		if file and allowed_file(file.filename):
+			filename = secure_filename(file.filename)
+			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			return render_template('upload.html', csv=data)
+
+	return render_template('upload.html')
 
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-	if request.method == 'POST':
+	file = None
+	data = None
+	if request.form['action'] == 'Upload':
 
 		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
 		file = request.files.get('file')
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			return redirect(url_for('process',
-                                    filename=filename))
+			
 		data = pd.read_csv(request.files.get('file'))
 
 		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
@@ -198,7 +213,11 @@ def upload_file():
 		global datawithoutnulls
 		datawithoutnulls = data.dropna()
 		html = datawithoutnulls.to_html(max_rows=20,border=10)
-		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html)
+		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html, csv=data)
+
+	if request.form['action']  == "Process":
+		return redirect(url_for('process',
+	                                    filename=filename))
 	return render_template('upload.html')
 
 @app.route('/process/<filename>', methods=['GET', 'POST'])
