@@ -179,6 +179,7 @@ def process():
 	
 	# With everything the user's given us, tie all the form rows together in objects so they can be handled discretely e.g. if not checked do X, if checked do Y etc.
 	listofentries = []
+	groups_created = []
 	for element in formelements:
 		i=0
 		while i<=csvcolumnheaders:
@@ -192,12 +193,15 @@ def process():
 			i+=1
 
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
-			listofentries.append(row_i)			
+			listofentries.append(row_i)	
+
 			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
 			if row_i.grp == 'Y':
 				create_groups(fname)
+				groups_created.append(fname)
 
-	return render_template('process.html', ua_default=listofentries[1])
+
+	return render_template('process.html', groups=groups_created)
 
 
 if __name__ == '__main__':
