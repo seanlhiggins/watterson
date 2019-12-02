@@ -15,7 +15,17 @@ app.config.from_pyfile('config.py')
 groupheadername = 'Market'
 sdk = client.setup('looker.ini')
 
+global datawithoutnulls
 
+class FormRow():
+
+    def __init__(self, fname, ftype, uadefault, grp, ua):
+        """Constructor"""
+        self.fname = fname
+        self.ftype = ftype
+        self.uadefault = uadefault
+        self.grp = grp
+        self.ua = ua
 
 # TODO: preliminary checks - 
 ## - Check if the users exist already, if not, create them - DONE
@@ -52,8 +62,9 @@ def create_users(email):
 
 
 def create_groups(groupheadername):
+	global datawithoutnulls
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
-	raw_column_values = (datanonnulls[groupheadername].unique())
+	raw_column_values = (datawithoutnulls[groupheadername].unique())
 	adjusted_column_values = []
 	for row in raw_column_values:
 		adjusted_column_values.append(groupheadername + " - " + row)
@@ -126,15 +137,7 @@ def add_users_to_groups():
 		except:
 			"Group or User Not Found"
 
-class FormRow():
 
-    def __init__(self, fname, ftype, uadefault, grp, ua):
-        """Constructor"""
-        self.fname = fname
-        self.ftype = ftype
-        self.uadefault = uadefault
-        self.grp = grp
-        self.ua = ua
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -155,9 +158,10 @@ def upload():
 
 
 		# Remove any rows that have nulls. A bit too intense but works fine for now.
-		datanonnulls = data.dropna()
-		html = datanonnulls.to_html(max_rows=20,border=10)
-		return render_template('upload.html', shape=datanonnulls.shape, columns=csvcolumnheaders, table=html)
+		global datawithoutnulls
+		datawithoutnulls = data.dropna()
+		html = datawithoutnulls.to_html(max_rows=20,border=10)
+		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders, table=html)
 	return render_template('upload.html')
 
 @app.route('/process', methods=['GET', 'POST'])
@@ -166,25 +170,29 @@ def process():
 	formelements.append(request.form.items())
 
 # Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form
-	csvcolumnheaders=8
+	global datawithoutnulls
+	csvcolumnheaders=len(datawithoutnulls.columns)
+
 	listofentries = []
 	for element in formelements:
 		i=0
 		while i<=csvcolumnheaders:
-			nameofrow = request.form.get("fieldname{}".format(i))
-			datatype = request.form.get("ftype{}".format(i))
+			fname = request.form.get("fieldname{}".format(i))
+			ftype = request.form.get("ftype{}".format(i))
 			uadefault = request.form.get("uadefault{}".format(i))
-			groupyesno = request.form.get("chkcreategroup{}".format(i))
-			uayesno = request.form.get("chkcreateuseratt{}".format(i))
+			grp = request.form.get("chkcreategroup{}".format(i))
+			ua = request.form.get("chkcreateuseratt{}".format(i))
+
 			i+=1
-			print(nameofrow,datatype,uadefault,groupyesno,uayesno)
-			row_i = FormRow(nameofrow,datatype,uadefault,groupyesno,uayesno)
+			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 			listofentries.append(row_i)			
-	if(listofentries.grp = 'Y'):
-		create_groups(listofentries.nameofrow)
+			if row_i.grp == 'Y':
+				create_groups(fname)
 
 
-	return render_template('process.html', ua_default=listofentries)
+
+
+	return render_template('process.html', ua_default=listofentries[1])
 
 
 if __name__ == '__main__':

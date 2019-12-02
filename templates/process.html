@@ -6,18 +6,16 @@
 <head>
 
 </head>
- {{ ua_default }}
 
 <br>
 
 <h1>Summary</h1>
-{% for items in kv %}
-	{{kv}}
-	<p>{{items}}</p>
-	<p>Key: {{k}}</p>
-    <p>Value: {{v}}</p>
+ <p>Row - {{ ua_default.fname }}</p>
+ <p>Datatype - {{ ua_default.ftype }}</p>
+ <p>Default UA Value - {{ ua_default.uadefault }}</p>
 
-{% endfor %}
+
+
 <body>
 </body>
 </html>
