@@ -171,17 +171,10 @@ def add_users_to_groups(emailheader, groupheader):
 
 
 
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
-	file = None
-	data = []
+@app.route('/', methods=['GET', 'POST'])
+def home():
 
 	if request.method == 'POST':
-
-		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
-		# data = pd.read_csv(request.files.get('file'))
-
-
 
 		# check if the post request has the file part
 		if 'file' not in request.files:
@@ -198,43 +191,34 @@ def upload_file():
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 			return redirect(url_for('uploaded_file',
 									filename=filename))
-		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
-		csvcolumnheaders = []
-		for col in data.columns:
-			csvcolumnheaders.append(col)
-
-		# Get just the email address header name so we can just quickly use it for creating users - DONE
-		r=re.compile("(?i).*email*")
-		emailheadername = list(filter(r.match,data.columns))[0]
-
-
-		# Remove any rows that have nulls. A bit too intense but works fine for now.
-		global datawithoutnulls
-		datawithoutnulls = data.dropna()
-		html = datawithoutnulls.to_html(max_rows=20)
-		# return redirect(url_for('process', filename=filename))
+		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders)
 
 
 	return render_template('upload.html')
 
+@app.route('/uploaded/<filename>', methods=['GET', 'POST'])
+def uploaded_file(filename):
+	data = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+	# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
+	csvcolumnheaders = [col for col in data.columns]
+	html_table = data.to_html(max_rows=20)
 
+	# Get just the email address header name so we can just quickly use it for creating users - DONE
+	r=re.compile("(?i).*email*")
+	emailheadername = list(filter(r.match,data.columns))[0]
+
+	if request.method == 'POST':
+		return redirect(url_for('process',
+									filename=filename))
+	return render_template('uploaded_file.html', table=html_table,columns=csvcolumnheaders)
 
 
 @app.route('/process/<filename>', methods=['GET', 'POST'])
-def uploaded_file(filename):
-
-
-
-
-	print(filename)
+def process(filename):
 	data_from_file = None
 	f = open(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-	for line in f:
-		print(f"newline - {line}")
-	print(f)
 	dataraw = f.read()
 	data = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-	print(data)
 	datawithoutnulls = data.dropna()
 	# Get everything a user sends in the form
 
@@ -255,7 +239,6 @@ def uploaded_file(filename):
 	r=re.compile("(?i).*email*")
 	# emailheadername = list(filter(r.match,data.columns))[0]
 	emailheadername = 'Email'
-	print(f"email header - {emailheadername}")
 	html_table = data.to_html(max_rows=20)
 	for element in formelements:
 		i=0
@@ -276,9 +259,6 @@ def uploaded_file(filename):
 			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
 			# if row_i.grp == 'Y':
 			# 	usergroupscreated = add_users_to_groups(emailheadername,fname)
-
-				
-
 
 
 	return render_template('process.html', 
