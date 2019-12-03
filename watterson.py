@@ -2,14 +2,14 @@ import pandas as pd
 import json
 import sys
 import numpy as np
-from flask import Flask, request, render_template, send_from_directory,redirect, url_for, session
+from flask import Flask, request, render_template, send_from_directory,redirect, url_for
 from looker_sdk import client, models
 import re
 import requests
 import urllib3
 from werkzeug.utils import secure_filename
 import os
-from io import StringIO
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -179,15 +179,25 @@ def upload_file():
 	if request.method == 'POST':
 
 		# First read a static CSV. Later we'll have a UI that will have a user provide a CSV 
-		data = pd.read_csv(request.files.get('file'))
-		file = request.files.get('file')
+		# data = pd.read_csv(request.files.get('file'))
 
 
+
+		# check if the post request has the file part
+		if 'file' not in request.files:
+			flash('No file part')
+			return redirect(request.url)
+		file = request.files['file']
+		# if user does not select file, browser also
+		# submit an empty part without filename
+		if file.filename == '':
+			flash('No selected file')
+			return redirect(request.url)
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			# return redirect(url_for('process',filename=filename, csv=data))	
-
+			return redirect(url_for('uploaded_file',
+									filename=filename))
 		# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
 		csvcolumnheaders = []
 		for col in data.columns:
@@ -202,7 +212,7 @@ def upload_file():
 		global datawithoutnulls
 		datawithoutnulls = data.dropna()
 		html = datawithoutnulls.to_html(max_rows=20)
-		return redirect(url_for('process', filename=filename))
+		# return redirect(url_for('process', filename=filename))
 
 
 	return render_template('upload.html')
@@ -211,16 +221,20 @@ def upload_file():
 
 
 @app.route('/process/<filename>', methods=['GET', 'POST'])
-def process():
-	# Can't access the global unless it's been assigned in scope, even if it's reassigned from another route seemingly
-	# global datawithoutnulls 
-
+def uploaded_file(filename):
 
 
 
 
 	print(filename)
-	global datawithoutnulls
+	data_from_file = None
+	f = open(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+	for line in f:
+		print(f"newline - {line}")
+	print(f)
+	dataraw = f.read()
+	data = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+	print(data)
 	datawithoutnulls = data.dropna()
 	# Get everything a user sends in the form
 
