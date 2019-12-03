@@ -72,7 +72,7 @@ CSV Headers:
 	{% endfor %}
 		<input id="csv" name="csv" type="hidden" value="{{data}}">
 
-		<input type=submit class="btn btn-primary" name="action" value="Process File">
+		<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File">
 	</form>
 
 

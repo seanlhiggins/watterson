@@ -8,7 +8,7 @@ import pandas as pd
 import json
 import sys
 import numpy as np
-from flask import Flask, request, render_template, send_from_directory,redirect, url_for
+from flask import Flask, request, render_template, send_from_directory,redirect, url_for, session
 from looker_sdk import client, models
 import re
 import requests
@@ -20,6 +20,9 @@ import os
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = Flask(__name__)
+app.secret_key = 'fjs9p4ajf@.w9(Fjfjw09'
+
+
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -151,16 +154,18 @@ def get_group_id_for_group_name(group_name):
 
 def add_users_to_groups(emailheader, groupheader):
 	global datawithoutnulls
+	print(emailheader,groupheader)
 	users = dict()
 	users_group = dict()
 	create_users(emailheader)
 	groups_created = create_groups(groupheader)
+	print(groups_created)
 	useremails = []
 	for i in range(0,datawithoutnulls.shape[0]):
 		email = datawithoutnulls[emailheader][i]
 		office = groupheader + " - " + datawithoutnulls[groupheader][i]
 		users[email]=office
-
+	print(useremails)
 	for k,v in users.items():
 		try:
 			useremails.append(k)
@@ -195,13 +200,13 @@ def home():
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			return redirect(url_for('uploaded_file',
+			return redirect(url_for('process',
 									filename=filename))
 		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders)
 	return render_template('upload.html')
 
-@app.route('/uploaded/<filename>', methods=['GET', 'POST'])
-def uploaded_file(filename):
+@app.route('/upload/<filename>', methods=['GET', 'POST'])
+def process(filename):
 	data = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],filename))
 	# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
 	csvcolumnheaders = [col for col in data.columns]
@@ -210,26 +215,31 @@ def uploaded_file(filename):
 	# Get just the email address header name so we can just quickly use it for creating users - DONE
 	r=re.compile("(?i).*email*")
 	emailheadername = list(filter(r.match,data.columns))[0]
-
+	print(filename)
 	if request.method == 'POST':
-		return redirect(url_for('process',
-									filename=filename))
+		session['formdata'] = request.form
+		return redirect(url_for('uploaded_file', filename=filename))
 	return render_template('uploaded_file.html', table=html_table,columns=csvcolumnheaders)
 
 
 @app.route('/process/<filename>', methods=['GET', 'POST'])
-def process(filename):
+def uploaded_file(filename):
 	data_from_file = None
 	f = open(os.path.join(app.config['UPLOAD_FOLDER'],filename))
 	dataraw = f.read()
 	data = pd.read_csv(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+
 	datawithoutnulls = data.dropna()
 	# Get everything a user sends in the form
+	sessiondata=(session['formdata'])
+	print(sessiondata)
 
 	formelements = []
 	formelements.append(request.form.items())
+	formelementsspread = [element for element in formelements]
 
 	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form 
+	fname1 = request.form.get("fieldname1")
 
 	csvcolumnheaders=8
 	# len(datawithoutnulls.columns)
@@ -255,21 +265,20 @@ def process(filename):
 			grp = request.form.get("chkcreategroup{}".format(i))
 			ua = request.form.get("chkcreateuseratt{}".format(i))
 			i+=1
-
+			print(f"all fields - {fname}{ftype}{uadefault}{grp}{ua}" )
 			# Create an object to store all the form values row-wise for concurrent handling
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 			listofentries.append(row_i)	
+			print(row_i)
 
 			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
-			# if row_i.grp == 'Y':
-			# 	usergroupscreated = add_users_to_groups(emailheadername,fname)
-
+			if row_i.grp == 'Y':
+				usergroupscreated = add_users_to_groups(emailheadername,fname)
 
 	return render_template('process.html', 
+							data=html_table, groups=usergroupscreated)
 
-							data=html_table)
-	# return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               # filename)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
