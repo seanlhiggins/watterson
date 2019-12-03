@@ -10,7 +10,6 @@
   overflow: hidden;
 }
 
-/* Style the links inside the navigation bar */
 .topnav a {
   float: left;
   color: black;
@@ -29,6 +28,57 @@
 /* Add a color to the active/current link */
 .topnav a.active {
   background-color: #64518A;
+  color: white;
+}
+.topnavuploaded {
+  background-color: #64518D;
+  overflow: hidden;
+}
+.topnavuploaded a {
+  float: left;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnavuploaded a:hover {
+  background-color: #64518D;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnavuploaded a.active {
+  background-color: #64518D;
+  color: white;
+}
+
+
+.topnavprocessed {
+  background-color: #64519F;
+  overflow: hidden;
+}
+/* Style the links inside the navigation bar */
+.topnavprocessed a {
+  float: left;
+  color: black;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnavprocessed a:hover {
+  background-color: #64519F;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnavprocessed a.active {
+  background-color: #64519F;
   color: white;
 }
 

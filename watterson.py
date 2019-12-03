@@ -1,3 +1,9 @@
+#######
+###		Watterson is meant to be a very basic bulk management tool for Looker to help augment workflows for those unfamiliar with using Looker's API to do so.
+###		It uses the Looker Python SDK to create Groups and Users based on a CSV file uploaded by a Looker admin.
+###		There are really 3 steps; upload a CSV file, see a summary page with selection options to do different things and then a process summary of what happened.
+###		
+#######
 import pandas as pd
 import json
 import sys
@@ -192,8 +198,6 @@ def home():
 			return redirect(url_for('uploaded_file',
 									filename=filename))
 		return render_template('upload.html', shape=datawithoutnulls.shape, columns=csvcolumnheaders)
-
-
 	return render_template('upload.html')
 
 @app.route('/uploaded/<filename>', methods=['GET', 'POST'])

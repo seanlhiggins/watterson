@@ -3,18 +3,34 @@
 <script type="text/javascript">
 
 </script>
-<head>
+{% extends 'upload.html' %}
+
+{% block head %}
+
+<head>	
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+{% endblock %}
+
+{% block topbar %}
+<div class="topnavprocessed">
+  <a class="active" href="/">Watterson</a>
+  <a class="active" >CSV Uploaded</a>
+</div>
+{% endblock %}
 
 </head>
 
-
+{% block main %}
 <h1>Summary</h1>
  <h2>Groups Created:</h2>
 
+ This is where the list of users and groups will be added as a list. This already works right now, just need to adjust the UI. 
 
-
-
- This is the data - {{ data|safe }}
+{% endblock %}
 
 <body>
 </body>
