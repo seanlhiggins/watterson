@@ -16,9 +16,9 @@
 {% endblock %}
 
 {% block topbar %}
-<div class="topnavprocessed">
+<div class="topnav">
   <a class="active" href="/">Watterson</a>
-  <a class="active" >CSV Uploaded</a>
+  <a class="active" >CSV Processed. Good Job.</a>
 </div>
 {% endblock %}
 
@@ -26,13 +26,8 @@
 
 {% block main %}
 <h1>Summary</h1>
- <h2>Groups Created:</h2>
-{{ groups }}
- This is where the list of users and groups will be added as a list. This already works right now, just need to adjust the UI. 
 
-{{ data | safe }}
-{{ usergroupscreated }}
-
+{{ groups | safe }}
 {% endblock %}
 
 <body>

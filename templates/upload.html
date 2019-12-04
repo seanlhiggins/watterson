@@ -37,53 +37,7 @@
 </div>
 <br>
 <br>
-<div id="uploadedcsv">
-CSV Headers: 
-	<div id="lk-content">
-		<table class="table table-striped users-table" style="float: center">
-			<thead>
-			<th>Field Name</th>
-			<th>Create As</th>
-			<th>Default Value</th>
-			<th>Add All Users to Group?</th>
-			<th>Assign All Users Default value</th>
-		</thead>
-		<tbody>
-<!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
 
-	<form  method=POST action="">
-	{% for header in columns %}
-	  	<tr>
-	  		<td><input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} ></td>
-
-			<td>
-				<select name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
-				<option value="">Select</option>
-				<option value="UA">User Attribute</option>
-				<option value="GRP">Group</option>
-				<option value="Both">Both</option>
-				</select>
-	  		</td>
-
-	  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
-			
-			<td><input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false"></td>
-			
-			<td><input type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
-		</tr>
-	{% endfor %}
-		<input id="csv" name="csv" type="hidden" value="{{data}}">
-
-		<input type=submit class="btn btn-primary" name="action" value="Process File">
-	</form>
-
-
-		</tbody>
-	</table>
-
-	</div>
-
-</div>
 <br>
 {% endblock %}
 

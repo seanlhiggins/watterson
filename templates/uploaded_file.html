@@ -6,13 +6,22 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+	<script type="text/javascript">
+	function conf()
+	{
+	var con=confirm("Processing the file will send API calls to Looker to create Groups, Users and User Attributes. This will potentially overwrite what currently exists. Are you sure you want to proceed?")
+	if (con)
+		return true;
+	else
+		return false;;
+	}
+</script>
 </head>
 {% endblock %}
 <body>
 
 {% block topbar %}
-<div class="topnavuploaded">
+<div class="topnav">
   <a class="active" href="/">Watterson</a>
   <a class="active" >CSV Uploaded</a>
 </div>
@@ -52,27 +61,46 @@ CSV Headers:
 	<form  method=POST action="">
 	{% for header in columns %}
 	  	<tr>
-	  		<td><input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} ></td>
+	  		<td>
+	  			<input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} >
+	  		</td>
 
 			<td>
-				<select name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
-				<option value="">Select</option>
-				<option value="UA">User Attribute</option>
-				<option value="GRP">Group</option>
-				<option value="Both">Both</option>
+				<select class="select-css" name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
+					<option value="">Select</option>
+					<option value="UA">User Attribute</option>
+					<option value="GRP">Group</option>
+					<option value="Both">Both</option>
 				</select>
 	  		</td>
 
 	  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
 			
-			<td><input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false"></td>
+			<td>
+				<label>
+				<span class="checkbox"> 
+					<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false">
+					<span class="checkbox-value" aria-hidden="true"></span>
+				</span>
+			</label>
+			</td>
 			
-			<td><input type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false"></td>
+			<td>
+				<label>
+					<span class="checkbox"> 
+						<input  type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false">
+						<span class="checkbox-value" aria-hidden="true"></span>
+					</span>
+				</label>
+			</td>
+
+
 		</tr>
 	{% endfor %}
 		<input id="csv" name="csv" type="hidden" value="{{data}}">
 
-		<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File">
+		<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File" onClick="conf()">
+
 	</form>
 
 
@@ -82,6 +110,10 @@ CSV Headers:
 	</div>
 
 </div>
+
+
+
+
 <br>
 {% endblock %}
 {% block tablesummary %}
