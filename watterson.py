@@ -55,8 +55,8 @@ def allowed_file(filename):
 # TODO: preliminary checks - 
 ## - Check if the users exist already, if not, create them - DONE
 
-def create_users(email):
-	global datawithoutnulls
+def create_users(email,data):
+	datawithoutnulls = data
 	existing_users = {user.email: user.id for user in sdk.all_users()}
 	print(f"existing users -{existing_users}")
 	csv_users = (datawithoutnulls[email].unique())
@@ -71,7 +71,7 @@ def create_users(email):
 			credentialspayload = {"email":email}
 			print(f"creds - {credentialspayload}")
 			print(f"newuser - {new_user}")
-			new_credentials = sdk.create_user_credentials_email(new_user['id'],credentialspayload)
+			new_credentials = sdk.create_user_credentials_email(new_user.id,credentialspayload)
 			existing_users[new_user.email] = new_user.id
 			print("Created New User " + email)
 		else :
@@ -96,13 +96,19 @@ def create_users(email):
 
 
 
-def create_groups(groupheadername):
-	global datawithoutnulls
+def create_groups(groupheadername, data):
+	datawithoutnulls = data
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
 	raw_column_values = (datawithoutnulls[groupheadername].unique())
+	extracted_numpy_row_values = [row for row in raw_column_values]
 	adjusted_column_values = []
-	for row in raw_column_values:
-		adjusted_column_values.append(groupheadername + " - " + row)
+	print(f"groupheader_creating_groups - {groupheadername}")
+	print(type(groupheadername))
+	print(raw_column_values)
+	i = 0
+	while i< len(extracted_numpy_row_values):
+		adjusted_column_values.append(groupheadername + " - " + extracted_numpy_row_values[0])
+		i+=1
 
 	for group in adjusted_column_values:
 		if not existing_groups.get(group):
@@ -118,7 +124,8 @@ def create_groups(groupheadername):
 			print("Group " + group + " already exists")
 	return adjusted_column_values
 
-def update_group_name(groupheadername):
+def update_group_name(groupheadername, data):
+	datanonnulls = data
 	unique_column_values = (datanonnulls[groupheadername].unique())
 	for group in unique_column_values:
 		lookergroup = get_group_id_for_group_name(group)
@@ -136,7 +143,7 @@ def update_group_name(groupheadername):
 ## Output in a dictionary so it can at least reference the right name/id pair.
 
 def get_group_id_for_group_name(group_name):
-	global datawithoutnulls
+	datawithoutnulls = data
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
 	newdict = dict()
 	
@@ -152,13 +159,13 @@ def get_group_id_for_group_name(group_name):
 ## Then with the list of Emails and Offices found in the CSV as a dict, pair them with the Groups and IDs
 ## in the get_group_id_for_group_name() created dictionary and add them to the group. 
 
-def add_users_to_groups(emailheader, groupheader):
-	global datawithoutnulls
+def add_users_to_groups(emailheader, groupheader,data):
+	datawithoutnulls = data
 	print(emailheader,groupheader)
 	users = dict()
 	users_group = dict()
-	create_users(emailheader)
-	groups_created = create_groups(groupheader)
+	create_users(emailheader,data)
+	groups_created = create_groups(groupheader,data)
 	print(groups_created)
 	useremails = []
 	for i in range(0,datawithoutnulls.shape[0]):
@@ -234,13 +241,9 @@ def uploaded_file(filename):
 	sessiondata=(session['formdata'])
 	print(sessiondata)
 
-	formelements = []
-	formelements.append(request.form.items())
-	formelementsspread = [element for element in formelements]
+
 
 	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form 
-	fname1 = request.form.get("fieldname1")
-
 	csvcolumnheaders=8
 	# len(datawithoutnulls.columns)
 	
@@ -252,29 +255,31 @@ def uploaded_file(filename):
 	usergroupscreated = None
 	r=re.compile("(?i).*email*")
 	# emailheadername = list(filter(r.match,data.columns))[0]
-	emailheadername = 'Email'
+	emailheadername = 'Email Address'
 	html_table = data.to_html(max_rows=20)
-	for element in formelements:
-		i=0
-		while i<=csvcolumnheaders:
 
-			# Have to do this  formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
-			fname = request.form.get("fieldname{}".format(i))
-			ftype = request.form.get("ftype{}".format(i))
-			uadefault = request.form.get("uadefault{}".format(i))
-			grp = request.form.get("chkcreategroup{}".format(i))
-			ua = request.form.get("chkcreateuseratt{}".format(i))
+	i=1
+	while i<=csvcolumnheaders:
+		if f'chkcreategroup{i}' in sessiondata:
+		# Have to do this  formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
+			fname = sessiondata[f'fieldname{i}']
+			ftype = sessiondata[f'ftype{i}']
+			uadefault = sessiondata[f'uadefault{i}']
+			grp = sessiondata[f'chkcreategroup{i}']
+			# ua = request.form.get("chkcreateuseratt{}".format(i))
 			i+=1
-			print(f"all fields - {fname}{ftype}{uadefault}{grp}{ua}" )
+			print(f"all fields - {fname}{ftype}{uadefault}" )
 			# Create an object to store all the form values row-wise for concurrent handling
-			row_i = FormRow(fname,ftype,uadefault,grp,ua)
+			row_i = FormRow(fname,ftype,uadefault,grp,'test1')
 			listofentries.append(row_i)	
 			print(row_i)
 
 			# If they've checked the Add Users to Group checkbox, create the groups and add users, otherwise just Create the Groups.
 			if row_i.grp == 'Y':
-				usergroupscreated = add_users_to_groups(emailheadername,fname)
-
+				usergroupscreated = add_users_to_groups(emailheadername,fname,data)
+			i+=1
+		else:
+			i+=1
 	return render_template('process.html', 
 							data=html_table, groups=usergroupscreated)
 
