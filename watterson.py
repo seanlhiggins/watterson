@@ -102,16 +102,17 @@ def create_groups(group_header_name, data):
 	raw_column_values = (data_without_nulls[group_header_name].unique())
 	extracted_numpy_row_values = [row for row in raw_column_values]
 	adjusted_column_values = []
-
+	print(extracted_numpy_row_values, len(extracted_numpy_row_values))
 	i = 0
 	while i< len(extracted_numpy_row_values):
-		adjusted_column_values.append(group_header_name + " - " + extracted_numpy_row_values[0])
+		adjusted_column_values.append(group_header_name + " - " + extracted_numpy_row_values[i])
 		i+=1
-
+	print(adjusted_column_values)
 	for group in adjusted_column_values:
+		print(f'group - {group}')
 		if not existing_groups.get(group):
 			try:
-				payload = {"name":group_header_name + " - " + group}
+				payload = {"name": group}
 				payloadjson=json.dumps(payload)
 				new_group = sdk.create_group(payloadjson)
 				existing_groups[new_group.name] = new_group.id
