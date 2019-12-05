@@ -18,25 +18,36 @@
 {% endblock %}
 
 {% block main %}
-<form method=post action="" enctype=multipart/form-data>
-    <input type=file name=file>
-    <input type=submit class ="btn btn-primary" name="action" value="Upload">
-</form>
+<div class="formwrapper">
+	<form method=post action="" enctype=multipart/form-data>
+	    <div class="upload-btn-wrapper">
+	    	<input  type=file name=file>
+	    </div>
+	    <label class="hostlabel">
+			Host:
+		</label>
+		<div class="hostinput">
+			<input class="txtin" type="text" name="host">
+		</div>
+		<label class="clientlabel">
+		Client ID:
+		</label>
+		<div class="clientinput">
+			<input class="txtin" type="text" name="clientid">
+		</div>
+		<label class="label">	
+		Client Secret:
+		</label>
+		<div class="secretinput">			
+			<input class="txtin" type="text" name="clientsecret">
+		</div>
+		<div class="upload-btn-wrapper">
+	 		   	<button class="btn">Upload</button>
+	    </div>
 
-<div id="auth">
-	<form >
-	  Host:<br>
-	  <input type="text" name="host">
-	  <br>
-	  Client ID:<br>
-	  <input type="text" name="clientid">
-	  <br>
-	  Client Secret:<br>
-	  <input type="text" name="clientsecret">
-	</form> 
+</form>
 </div>
-<br>
-<br>
+
 
 <br>
 {% endblock %}

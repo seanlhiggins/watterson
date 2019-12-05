@@ -83,25 +83,22 @@
   color: white;
 }
 
-/*.table.table-striped th, .looker-flavored-markdown table.table-striped:not(.lk-vis-table) th {
-    background: transparent;
-    color: #696969;
-    border-bottom: 1px solid #e4e5e6;
-    margin-bottom: 10px;
-    border-spacing: 0;
-}*/
-#uploadedcsv {
+.form-wrapper {
+  padding: 10px 10px 10px 10px
+  margin-left:10px;
+}
+.uploadedcsv {
   padding: 10px 200px 0px 200px;
-  border: thin;
+  border: thick;
   float: center;
   color: #696969;;
 }
 
-#lk-content{
-   padding: 10px 200px 0px 200px;
+.lk-content{
+  padding: 10px 10px 1px 10px;
   border: thin;
   float: center;
-  color: #cc99cc;;
+  color: #64518A;;
 }
 .checkbox input {
   border: 0;
@@ -157,6 +154,31 @@ input:checked + .checkbox-value::before {
   left: 75%;
 }
 
+.txtin {
+    display: block;
+    width: 25%;
+    background: transparent;
+    font-family: JosefinSans-Bold;
+    font-size: 15px;
+    color: #1b3815;
+    line-height: 1.5;
+    display: inline-flex;
+}
+
+
+/*.btn {
+  border: 2px solid gray;
+  color: gray;
+  background-color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: bold;
+}*/
+
+.upload-btn-wrapper  {
+  color: #64518A;
+}
 select-css {
     display: block;
     font-size: 16px;
@@ -200,13 +222,28 @@ select-css {
 }
 
 
-body {
-  text-align: center;
-  background: #fff;
-  color: #55555a;
-  font-family: "Open Sans","Noto Sans JP","Noto Sans","Noto Sans CJK KR",Helvetica,Arial,sans-serif;
-  font-weight: 100;
-  font-size: 12px;
+
+body#lk-layout-simple {
+    background-color: #2e343f;
+    color: white;
+    height: auto;
+    text-align: center;
+    font-family: "Helvetica";
+    font-weight: 100;
+    font-size: 12px;
+    background: #2e343f;
+
+}
+
+#lk-layout-simple-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.lk-simple-title {
+    text-align: center;
+    margin-bottom: 40px;
+    font-weight: 100;
+    font-size: 20px;
 }
 
 th, td {
@@ -224,7 +261,7 @@ tr {
     border-left-color: inherit;
 }
 
-.btn-primary {
+.btn {
     color: #fff;
     background: #64518A;
     border: 2px solid #64518A;

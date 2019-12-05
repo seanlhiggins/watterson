@@ -1,0 +1,22 @@
+
+{% block content %}
+    <h1>Sign In</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.host.label }}<br>
+            {{ form.host(size=32) }}
+        </p>
+        <p>
+            {{ form.client_id.label }}<br>
+            {{ form.client_id(size=32) }}
+        </p>
+        <p>
+            {{ form.client_secret.label }}<br>
+            {{ form.client_id(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+
+        {{u}}
+    </form>
+{% endblock %}

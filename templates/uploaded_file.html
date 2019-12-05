@@ -30,87 +30,73 @@
 {% block main %}
 
 
-<div id="auth">
-	<form >
-	  Host:<br>
-	  <input type="text" name="host">
-	  <br>
-	  Client ID:<br>
-	  <input type="text" name="clientid">
-	  <br>
-	  Client Secret:<br>
-	  <input type="text" name="clientsecret">
-	</form> 
-</div>
-<br>
-<br>
-<div id="uploadedcsv">
-CSV Headers: 
-	<div id="lk-content">
-		<table class="table table-striped users-table" style="float: center">
-			<thead>
-			<th>Field Name</th>
-			<th>Create As</th>
-			<th>Default Value</th>
-			<th>Add All Users to Group?</th>
-			<th>Assign All Users Default value</th>
-		</thead>
-		<tbody>
-<!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
+<div class="form-wrapper">
+	<div class="uploadedcsv">
+	<label class="edit-options-label">
+		<h3>User Edit Options: </h3>
+		<span class="sublabel">
+			For each of the columsn in the CSV you uploaded, you have a number of selection criteria. 
+			For columns such as 'Teams' or 'Offices', these are typically Groups create for organisational purposes. 
+			For columns such as 'Region' or 'Access', these are commonly used for User Attributes. 
+		</span>
+	</label>
+		<div class="lk-content">
+			<table class="table table-striped users-table" style="float: center">
+				<thead>
+					<th>Field Name</th>
+					<th>Create As</th>
+					<th>Default Value</th>
+					<th>Add All Users to Group?</th>
+					<th>Assign All Users Default value</th>
+				</thead>
+			<tbody>
+	<!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
+		<form  method=POST action="">
+		{% for header in columns %}
+		  	<tr>
+		  		<td>
+		  			<input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} >
+		  		</td>
 
-	<form  method=POST action="">
-	{% for header in columns %}
-	  	<tr>
-	  		<td>
-	  			<input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} >
-	  		</td>
+				<td>
+					<select class="select-css" name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
+						<option value="">Select</option>
+						<option value="UA">User Attribute</option>
+						<option value="GRP">Group</option>
+						<option value="Both">Both</option>
+					</select>
+		  		</td>
 
-			<td>
-				<select class="select-css" name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
-					<option value="">Select</option>
-					<option value="UA">User Attribute</option>
-					<option value="GRP">Group</option>
-					<option value="Both">Both</option>
-				</select>
-	  		</td>
-
-	  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
-			
-			<td>
-				<label>
-				<span class="checkbox"> 
-					<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false">
-					<span class="checkbox-value" aria-hidden="true"></span>
-				</span>
-			</label>
-			</td>
-			
-			<td>
-				<label>
+		  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
+				
+				<td>
+					<label>
 					<span class="checkbox"> 
-						<input  type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false">
+						<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false">
 						<span class="checkbox-value" aria-hidden="true"></span>
 					</span>
 				</label>
-			</td>
+				</td>
+				
+				<td>
+					<label>
+						<span class="checkbox"> 
+							<input  type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false">
+							<span class="checkbox-value" aria-hidden="true"></span>
+						</span>
+					</label>
+				</td>
 
 
-		</tr>
-	{% endfor %}
-		<input id="csv" name="csv" type="hidden" value="{{data}}">
-
-		<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File" onClick="conf()">
-
-	</form>
-
-
-		</tbody>
-	</table>
-
+			</tr>
+		{% endfor %}
+				<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File" onClick="conf()">
+				</form>
+			</tbody>
+		</table>
+		</div>
 	</div>
-
 </div>
-
 
 
 

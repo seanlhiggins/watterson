@@ -8,18 +8,32 @@ import pandas as pd
 import json
 import sys
 import numpy as np
-from flask import Flask, request, render_template, send_from_directory,redirect, url_for, session
+from flask import Flask, request, render_template, send_from_directory,redirect, url_for, session, flash
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired
+
 from looker_sdk import client, models
 import re
 import requests
 import urllib3
 from werkzeug.utils import secure_filename
 import os
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_login import LoginManager,UserMixin
+from app import app, db
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
+app = Flask(__name__)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+login = LoginManager(app)
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-app = Flask(__name__)
 app.secret_key = 'fjs9p4ajf@.w9(Fjfjw09'
 
 
@@ -36,7 +50,35 @@ sdk = client.setup('looker.ini')
 
 global datawithoutnulls
 
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+class User(UserMixin,db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), index=True, unique=True)
+    email = db.Column(db.String(120), index=True, unique=True)
+    password_hash = db.Column(db.String(128))
+
+    def __repr__(self):
+        return '<User {}>'.format(self.username)    
+
+class User(db.Model):
+    # ...
+
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+class APILoginForm(FlaskForm):
+    host = StringField('Host', validators=[DataRequired()])
+    client_id = PasswordField('Client_ID', validators=[DataRequired()])
+    client_secret = PasswordField('Client_Secret', validators=[DataRequired()])
+    submit = SubmitField('Authenticate')
 # This object is for linking all the form elements into a row-wise, linked reference so they can be handled concurrently later
+
 class FormRow():
 
     def __init__(self, fname, ftype, uadefault, grp, ua):
@@ -187,6 +229,28 @@ def add_users_to_groups(email_header, group_header,data):
 	return '''<h2>Groups Created</h2> - {}. 
 	<h2>Users created</h2> - {}'''.format(groups_created, [x for x in user_emails])
 
+@app.shell_context_processor
+def make_shell_context():
+    return {'db': db, 'User': User}
+
+@app.route('/login',methods=['GET','POST'])
+def login():
+
+	if current_user.is_authenticated:
+		return redirect(url_for('home'))
+	apiform = LoginForm()
+	if apiform.validate_on_submit():
+		user = User.query.filter_by(username=apiform.username.data).first()
+		if user is None or not user.check_password(apiform.password.data):
+			flash('Invalid username or password')
+			return redirect(url_for('home'))
+		login_user(user, remember=form.remember_me.data)
+#	>>> u = User(username='susan', email='susan@example.com')
+# 	>>> db.session.add(u)
+# 	>>> db.session.commit()
+		return redirect('/')
+	print("Couldn't Login")
+	return render_template('login.html', title='Authenticate', form=apiform)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -207,8 +271,9 @@ def home():
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+			
 			return redirect(url_for('process',
-									filename=filename))
+										filename=filename))
 	return render_template('upload.html')
 
 @app.route('/upload/<filename>', methods=['GET', 'POST'])
@@ -217,14 +282,14 @@ def process(filename):
 	# Get all the column names. Later we'll use these to create an array in the UI with checkboxes for each - DONE
 	csv_column_headers = [col for col in data.columns]
 	html_table = data.to_html(max_rows=20)
-
 	# Get just the email address header name so we can just quickly use it for creating users - DONE
 	r=re.compile("(?i).*email*")
 	emailheadername = list(filter(r.match,data.columns))[0]
 	print(filename)
 	if request.method == 'POST':
-		session['formdata'] = request.form
-		return redirect(url_for('uploaded_file', filename=filename))
+		
+			session['formdata'] = request.form
+			return redirect(url_for('uploaded_file', filename=filename))
 	return render_template('uploaded_file.html', table=html_table,columns=csv_column_headers)
 
 
