@@ -12,6 +12,7 @@ from flask import Flask, request, render_template, send_from_directory,redirect,
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
+from config import Config
 
 from looker_sdk import client, models
 import re
@@ -22,6 +23,8 @@ import os
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager,UserMixin
+from flask_login import current_user, login_user
+
 from app import app, db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -42,7 +45,7 @@ ALLOWED_EXTENSIONS = {'csv'}
 
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config.from_object('config')
+app.config.from_object(Config)
 app.config.from_pyfile('config.py')
 
 
@@ -237,19 +240,22 @@ def make_shell_context():
 def login():
 
 	if current_user.is_authenticated:
+		flash("already authenticated")
 		return redirect(url_for('home'))
-	apiform = LoginForm()
+	apiform = APILoginForm()
 	if apiform.validate_on_submit():
-		user = User.query.filter_by(username=apiform.username.data).first()
+		flash("Validated")
+		user = User.query.filter_by(username=apiform.host.data).first()
 		if user is None or not user.check_password(apiform.password.data):
 			flash('Invalid username or password')
 			return redirect(url_for('home'))
-		login_user(user, remember=form.remember_me.data)
+		login_user(host, remember=apiform.client_id.data)
 #	>>> u = User(username='susan', email='susan@example.com')
 # 	>>> db.session.add(u)
 # 	>>> db.session.commit()
 		return redirect('/')
-	print("Couldn't Login")
+	else:	
+		print(apiform)
 	return render_template('login.html', title='Authenticate', form=apiform)
 
 
