@@ -273,3 +273,7 @@ tbody {
     vertical-align: middle;
     border-color: inherit;
 }
+.description-main{
+  text-align: center;
+  width: 100%
+}

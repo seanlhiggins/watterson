@@ -1,5 +1,5 @@
-
-{% block content %}
+{% extends 'upload.html' %}
+{% block main %}
     <h1>Sign In</h1>
     <form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
@@ -17,16 +17,27 @@
         </p>
         <p>{{ form.submit() }}</p>
 
-        {{u}}
+
     </form>
+<div class="description">
+    <span class="description-main">Welcome to Watterson!
+    </span>
+    <br>
+    <span> Authenticate against your Looker instance using your own personal API credentials which will be used for the session
+    </span>
+    <br>
+    <span class="description-sub">After authenticating, you will upload a CSV which you have already created containing users and intended Groups and/or User Attributes. This tool will allow you to mass/bulk edit those users and sort them into Groups easily without having to maintain it within Looker. 
+    </span>
+</div>
 {% endblock %}
 
+
 {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith%}
+{% if messages %}
+<ul>
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endwith%}
