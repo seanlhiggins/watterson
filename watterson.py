@@ -23,10 +23,6 @@ from werkzeug.utils import secure_filename
 import os
 # from flask_sqlalchemy import SQLAlchemy
 
-
-
-
-
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -40,23 +36,17 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app.secret_key = 'fjs9p4ajf@.w9(Fjfjw09'
 
-
 UPLOAD_FOLDER = 'uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = {'csv'}
 
 
 def auth(url):
-	print(os.environ['LOOKERSDK_CLIENT_ID'])
-	print(os.environ['LOOKERSDK_BASE_URL'])
 
-	print(os.environ['LOOKERSDK_CLIENT_SECRET'])
 	api_settings.ApiSettings(base_url = url)
 	settings = api_settings.ApiSettings(base_url = url,verify_ssl=False, timeout=200)
-
 	settings.headers = {"Content-Type": "application/json"}
 	transport = requests_transport.RequestsTransport.configure(settings)
-	print(transport, settings)
 	sdk = methods.LookerSDK(
 	        auth_session.AuthSession(settings, transport, serialize.deserialize),
 	        serialize.deserialize,
@@ -67,9 +57,8 @@ def auth(url):
 	print(me)
 	return sdk
 
-
+# class for each row in the UI that has a form element submitted
 class FormRow():
-
     def __init__(self, fname, ftype, uadefault, grp, ua):
         """Constructor"""
         self.fname = fname
@@ -89,19 +78,13 @@ def allowed_file(filename):
 def create_users(email,data):
 	data_without_nulls = data
 	existing_users = {user.email: user.id for user in sdk.all_users()}
-	print(f"existing users -{existing_users}")
 	csv_users = (data_without_nulls[email].unique())
 	for email in csv_users:
-		print(f"email - {email}")
 		if not existing_users.get(email,):
-			print(f"nonexistingemail {existing_users.get(email)}")
 			payload = {"name": email}
-			print(f"payload - {payload}")
 			payloadjson=json.dumps(payload)
 			new_user = sdk.create_user(payloadjson)
 			credentialspayload = {"email":email}
-			print(f"creds - {credentialspayload}")
-			print(f"newuser - {new_user}")
 			new_credentials = sdk.create_user_credentials_email(new_user.id,credentialspayload)
 			existing_users[new_user.email] = new_user.id
 			print("Created New User " + email)
@@ -133,14 +116,13 @@ def create_groups(group_header_name, data):
 	raw_column_values = (data_without_nulls[group_header_name].unique())
 	extracted_numpy_row_values = [row for row in raw_column_values]
 	adjusted_column_values = []
-	print(extracted_numpy_row_values, len(extracted_numpy_row_values))
+
 	i = 0
 	while i< len(extracted_numpy_row_values):
 		adjusted_column_values.append(group_header_name + " - " + extracted_numpy_row_values[i])
 		i+=1
-	print(adjusted_column_values)
+
 	for group in adjusted_column_values:
-		print(f'group - {group}')
 		if not existing_groups.get(group):
 			try:
 				payload = {"name": group}
@@ -173,10 +155,8 @@ def update_group_name(groupheadername, data):
 ## Output in a dictionary so it can at least reference the right name/id pair.
 
 def get_group_id_for_group_name(group_name):
-	data_without_nulls = data
 	existing_groups = {group.name: group.id for group in sdk.all_groups()}
 	newdict = dict()
-	
 	for (k,v) in existing_groups.items():
 		if k == group_name:
 			newdict[k] = v
@@ -191,22 +171,23 @@ def get_group_id_for_group_name(group_name):
 
 def add_users_to_groups(email_header, group_header,data):
 	data_without_nulls = data
-	print(email_header,group_header)
+
 	users = dict()
 	users_group = dict()
 	create_users(email_header,data)
 	groups_created = create_groups(group_header,data)
-	print(groups_created)
+
 	user_emails = []
 	for i in range(0,data_without_nulls.shape[0]):
 		email = data_without_nulls[email_header][i]
 		office = group_header + " - " + data_without_nulls[group_header][i]
 		users[email]=office
-	print(user_emails)
+
 	for k,v in users.items():
 		try:
 			user_emails.append(k)
 			userid = sdk.user_for_credential('email', k)
+
 			groupnameid = get_group_id_for_group_name(v)
 			users_group[userid.id] = groupnameid[v]
 			payload = {"user_id": userid.id}
@@ -215,14 +196,36 @@ def add_users_to_groups(email_header, group_header,data):
 			print("Added user " + k + " to Group " + v)
 		except:
 			"Group or User Not Found"
-	return '''<h2>Groups Created</h2> - {}. 
+	return '''<h2>Groups Created</h2> -  
 	<h2>Users created</h2> - {}'''.format(groups_created, [x for x in user_emails])
 
-# @app.shell_context_processor
-# def make_shell_context():
-#     return {'db': db, 'User': User}
 
+##### USER ATTRIBUTE FUNCTIONS
+def create_user_attribute(ua_name, default_value, type, data):
+	data_without_nulls = data
+	existing_ua = {ua.name: ua.id for ua in sdk.all_user_attributes()}
+	raw_column_values = (data_without_nulls[ua_name].unique())
+	extracted_numpy_row_values = [row for row in raw_column_values]
+	adjusted_column_values = []
 
+	i = 0
+	while i< len(extracted_numpy_row_values):
+		adjusted_column_values.append(extracted_numpy_row_values[i])
+		i+=1
+
+	for uavalue in adjusted_column_values:
+		if not existing_ua.get(ua_name):
+			try:
+				payload = {"name": uavalue,"default_value":default_value}
+				payloadjson=json.dumps(payload)
+				new_ua = sdk.create_user_attribute(payloadjson)
+				existing_ua[new_ua.name] = new_ua.id
+				print("Created New User Attribute " + uavalue)
+			except:
+				print("Failed to create " + uavalue)
+		else:
+			print("User Attribute " + uavalue + " already exists")
+	return '''<h2 User Attribute Created</h2> - {}'''.format([attribute for attribute in adjusted_column_values])
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -236,8 +239,7 @@ def home():
 
 		#just check the SDK is initiated
 		me = sdk.me()
-		print(me)
-		# print(host,client_id,client_secret)
+
 		# check if the post request has the file part
 		if 'file' not in request.files:
 			flash('No file part')
@@ -264,9 +266,9 @@ def process(filename):
 	html_table = data.to_html(max_rows=20)
 	# Get just the email address header name so we can just quickly use it for creating users - DONE
 	r=re.compile("(?i).*email*")
-	print(sdk.me())
+
 	emailheadername = list(filter(r.match,data.columns))[0]
-	print(filename)
+
 	if request.method == 'POST':
 		
 			session['formdata'] = request.form
@@ -284,7 +286,6 @@ def uploaded_file(filename):
 	data_without_nulls = data.dropna()
 	# Get everything a user sends in the form
 	sessiondata=(session['formdata'])
-	print(sessiondata)
 
 	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form 
 	csv_column_headers=len(data_without_nulls.columns)
@@ -307,14 +308,16 @@ def uploaded_file(filename):
 			grp = sessiondata[f'chkcreategroup{i}']
 			# ua = request.form.get("chkcreateuseratt{}".format(i))
 			i+=1
-			print(f"all fields - {fname}{ftype}{uadefault}" )
+
 			# Create an object to store all the form values row-wise for concurrent handling
 			row_i = FormRow(fname,ftype,uadefault,grp,'test1')
 
 
 			# If they've checked the Add Users to Group checkbox and create as Group, create the groups and add users, otherwise just Create the Groups.
 			if row_i.ftype == 'GRP' and row_i.grp == 'Y':
+				print('creating groups and adding users to groups')
 				items_created = add_users_to_groups(email_header_name,fname,data)
+
 			elif row_i.ftype == 'GRP':
 				print('creating group only')
 				items_created = create_groups(fname,data)

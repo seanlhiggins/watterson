@@ -35,9 +35,9 @@
 	<label class="edit-options-label">
 		<h3>User Edit Options: </h3>
 		<span class="sublabel">
-			For each of the columsn in the CSV you uploaded, you have a number of selection criteria. 
-			For columns such as 'Teams' or 'Offices', these are typically Groups create for organisational purposes. 
-			For columns such as 'Region' or 'Access', these are commonly used for User Attributes. 
+			<p>For each of the columns in the CSV you uploaded, you have a number of selection criteria. 
+			For columns such as 'Teams' or 'Offices', these are typically Groups created for organisational purposes. 
+			For columns such as 'Region' or 'Access', these are commonly used for User Attributes. </p>
 		</span>
 	</label>
 		<div class="lk-content">
@@ -53,6 +53,7 @@
 	<!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
 		<form  method=POST action="">
 		{% for header in columns %}
+		<div class="processingoptions">
 		  	<tr>
 		  		<td>
 		  			<input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} >
@@ -89,6 +90,7 @@
 
 
 			</tr>
+		</div>
 		{% endfor %}
 				<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File" onClick="conf()">
 				</form>

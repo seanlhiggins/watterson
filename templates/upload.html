@@ -11,43 +11,60 @@
 <body>
 
 {% block topbar %}
-<div class="topnav">
-  <a class="active" href="/">Watterson</a>
-  <a class="active" >A CSV upload page for Looker user management</a>
+<div class="main">
+	<div class="topnav">
+	  <a class="active" href="/">Watterson</a>
+	  <a class="active" >A CSV upload page for Looker user management</a>
+	</div>
+	{% endblock %}
+<div class="title">
+	<h1>Overview</h1>
+	<p>Watterson is a basic CSV upload tool that allows you to bulk manage users and groups outside of your Looker interface.<p>
+	<p>Rather than spending time manually adding Users, then single clicking to add them to Groups and then adding User Attributes, Watterson takes your pre-prepared CSV of Users and gives you options after uploading regarding how to process them. </p>
+	<p>You can choose to add all users directly to Groups, create corresponding Group/User Attribute pairings, apply default values to all users</p>
 </div>
-{% endblock %}
+<hr>
 
-{% block main %}
-<div class="formwrapper">
-	<form method=post action="" enctype=multipart/form-data>
-	    <div class="upload-btn-wrapper">
-	    	<input  type=file name=file>
-	    </div>
-	    <label class="hostlabel">
-			Host:
-		</label>
-		<div class="hostinput">
-			<input class="txtin" type="text" name="host">
-		</div>
-		<label class="clientlabel">
-		Client ID:
-		</label>
-		<div class="clientinput">
-			<input class="txtin" type="text" name="clientid">
-		</div>
-		<label class="label">	
-		Client Secret:
-		</label>
-		<div class="secretinput">			
-			<input class="txtin" type="text" name="clientsecret">
-		</div>
-		<div class="upload-btn-wrapper">
-	 		   	<button class="btn">Upload</button>
-	    </div>
+	{% block main %}
+	<div class="formwrapper">
+		 <div class="instructions">
+				<p>Choose a CSV file that is populated with User, Group and User Attribute information for processing</p>
 
-</form>
+			</div>
+		<form method=post action="" enctype=multipart/form-data>
+		    <div class="upload-btn-wrapper">
+		    	<input  type=file name=file>
+		    </div>
+		    <div class="instructions">
+				<p>Enter the URL of your Looker host as well as your API credentials (Client ID and Client Secret)</p>
+
+			</div>
+		    <label class="hostlabel">
+				Host:
+			</label>
+			<div class="hostinput">
+				<input class="txtin" type="text" name="host">
+			</div>
+			<label class="clientlabel">
+			Client ID:
+			</label>
+			<div class="clientinput">
+				<input class="txtin" type="text" name="clientid">
+			</div>
+			<label class="label">	
+			Client Secret:
+			</label>
+			<div class="secretinput">			
+				<input class="txtin" type="text" name="clientsecret">
+			</div>
+			<br>
+			<div class="upload-btn-wrapper">
+		 		   	<button class="btn">Upload</button>
+		    </div>
+
+	</form>
+	</div>
 </div>
-
 
 <br>
 {% endblock %}
