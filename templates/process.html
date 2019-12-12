@@ -26,10 +26,25 @@
 
 {% block main %}
 <h1>Summary</h1>
+<div class="output">
+	<div class = "groups">
+		<h2> Groups Created:</h2>
+	<ul>{% for group in groups %}
+		<li> {{ group }}</li>
+		{% endfor %}
+	</ul>
+	</div>
+	<div class="users">
+		<h2> Users Created:</h2>
 
-{{ groups | safe }}
+	<ul>{% for user in users %}
+		<li> {{ user }}</li>
+		{% endfor %}
+
+	</ul>
+	</div>
+</div>
 {% endblock %}
-
 <body>
 </body>
 </html>

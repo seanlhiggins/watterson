@@ -134,7 +134,7 @@ def create_groups(group_header_name, data):
 				print("Failed to create " + group)
 		else:
 			print("Group " + group + " already exists")
-	return '''<h2 Groups Created</h2> - {}'''.format([groups for groups in adjusted_column_values])
+	return [groups for groups in adjusted_column_values]
 
 def update_group_name(groupheadername, data):
 	datanonnulls = data
@@ -196,8 +196,7 @@ def add_users_to_groups(email_header, group_header,data):
 			print("Added user " + k + " to Group " + v)
 		except:
 			"Group or User Not Found"
-	return '''<h2>Groups Created</h2> -  
-	<h2>Users created</h2> - {}'''.format(groups_created, [x for x in user_emails])
+	return groups_created, user_emails
 
 
 ##### USER ATTRIBUTE FUNCTIONS
@@ -325,7 +324,7 @@ def uploaded_file(filename):
 		else:
 			i+=1
 	return render_template('process.html', 
-							data=html_table, groups=items_created)
+							data=html_table, groups=items_created[0], users=items_created[1])
 
 
 
