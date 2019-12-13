@@ -14,7 +14,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired
 from config import *
 from looker_sdk.rtl import api_settings, auth_session,transport,serialize,requests_transport
-from looker_sdk import client, models
+from looker_sdk import client, models, error
 from looker_sdk import methods
 import re
 import requests
@@ -41,21 +41,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = {'csv'}
 
 
-def auth(url):
 
-	api_settings.ApiSettings(base_url = url)
-	settings = api_settings.ApiSettings(base_url = url,verify_ssl=False, timeout=200)
-	settings.headers = {"Content-Type": "application/json"}
-	transport = requests_transport.RequestsTransport.configure(settings)
-	sdk = methods.LookerSDK(
-	        auth_session.AuthSession(settings, transport, serialize.deserialize),
-	        serialize.deserialize,
-	        serialize.serialize,
-	        transport,
-	    )
-	me= sdk.me()
-	print(me)
-	return sdk
 
 # class for each row in the UI that has a form element submitted
 class FormRow():
@@ -200,31 +186,34 @@ def add_users_to_groups(email_header, group_header,data):
 
 
 ##### USER ATTRIBUTE FUNCTIONS
-def create_user_attribute(ua_name, default_value, type, data):
+def create_user_attribute(ua_name, default_value, data, uatype='string'):
 	data_without_nulls = data
 	existing_ua = {ua.name: ua.id for ua in sdk.all_user_attributes()}
-	raw_column_values = (data_without_nulls[ua_name].unique())
-	extracted_numpy_row_values = [row for row in raw_column_values]
-	adjusted_column_values = []
 
-	i = 0
-	while i< len(extracted_numpy_row_values):
-		adjusted_column_values.append(extracted_numpy_row_values[i])
-		i+=1
+	if not existing_ua.get(ua_name):
+		print(f'{existing_ua}')
+		print(f'uavalue = {ua_name}, default = {default_value}')
+		try:
+			payload = {"name": ua_name,"default_value":"","label":ua_name,"type":"string"}
+			print(f'{payload}')
+			payloadjson=json.dumps(payload)
+			print(f'{payloadjson}')
+			# new_ua = sdk.create_user_attribute(payloadjson)
+			# new_ua = sdk.create_user_attribute({"name": "oneuatobindthem","default_value":"",	"label":"This Is Newest","type":"string"})
+			# new_ua = sdk.create_user_attribute({"name": "twouatobindthem","default_value":"","label":"This Is Newerer","type":"string"})
+			# new_ua = sdk.create_user_attribute({"name": "Team", 		  "default_value":"",	"label":"Team", 		  "type":"string"})
+			print(new_ua)
+			print("Created New User Attribute " + ua_name)
+			return ua_name, default_value
+		except:
+			print("Failed to create " + ua_name)
+		
+	else:
+		print("User Attribute " + ua_name + " already exists")
 
-	for uavalue in adjusted_column_values:
-		if not existing_ua.get(ua_name):
-			try:
-				payload = {"name": uavalue,"default_value":default_value}
-				payloadjson=json.dumps(payload)
-				new_ua = sdk.create_user_attribute(payloadjson)
-				existing_ua[new_ua.name] = new_ua.id
-				print("Created New User Attribute " + uavalue)
-			except:
-				print("Failed to create " + uavalue)
-		else:
-			print("User Attribute " + uavalue + " already exists")
-	return '''<h2 User Attribute Created</h2> - {}'''.format([attribute for attribute in adjusted_column_values])
+
+
+##### ROUTES {
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -233,12 +222,11 @@ def home():
 		base_url = os.environ['LOOKERSDK_BASE_URL'] = request.form['host']
 		os.environ['LOOKERSDK_CLIENT_ID'] = request.form['clientid']
 		os.environ['LOOKERSDK_CLIENT_SECRET'] = request.form['clientsecret']
-		sdk = auth(base_url)
-		auth(base_url)
+		sdk = client.setup()
 
 		#just check the SDK is initiated
 		me = sdk.me()
-
+		print(me)
 		# check if the post request has the file part
 		if 'file' not in request.files:
 			flash('No file part')
@@ -296,36 +284,67 @@ def uploaded_file(filename):
 	# emailheadername = list(filter(r.match,data.columns))[0]
 	email_header_name = 'Email Address'
 	html_table = data.to_html(max_rows=20)
-
+	print(sessiondata)
 	i=1
 	while i<=csv_column_headers:
+		print(f'checkcreategroup{i} + chkcreateua{i}')
 		if f'chkcreategroup{i}' in sessiondata:
+			print(f'chkcreategroup{i}')
 		# Have to do this  formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
 			fname = sessiondata[f'fieldname{i}']
 			ftype = sessiondata[f'ftype{i}']
 			uadefault = sessiondata[f'uadefault{i}']
 			grp = sessiondata[f'chkcreategroup{i}']
-			# ua = request.form.get("chkcreateuseratt{}".format(i))
-			i+=1
+			ua = None
 
 			# Create an object to store all the form values row-wise for concurrent handling
-			row_i = FormRow(fname,ftype,uadefault,grp,'test1')
+			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 
 
 			# If they've checked the Add Users to Group checkbox and create as Group, create the groups and add users, otherwise just Create the Groups.
-			if row_i.ftype == 'GRP' and row_i.grp == 'Y':
+			if row_i.grp =='Y' and not row_i.ftype:
+				alert('Choose the data type')
+
+			elif row_i.ftype == 'GRP' and row_i.grp == 'Y':
 				print('creating groups and adding users to groups')
 				items_created = add_users_to_groups(email_header_name,fname,data)
+				return render_template('process.html', 
+								data=html_table, groups=items_created[0], users=items_created[1])
 
 			elif row_i.ftype == 'GRP':
 				print('creating group only')
 				items_created = create_groups(fname,data)
+				return render_template('process.html', 
+							data=html_table, groups=items_created[0])
+		
+		elif sessiondata[f'ftype{i}'] == 'UA':
+			print('got here')
+			fname = sessiondata[f'fieldname{i}']
+			ftype = sessiondata[f'ftype{i}']
+			uadefault = sessiondata[f'uadefault{i}']
+			grp = None
+			if f'chkcreateua{i}' in sessiondata:
+				ua = sessiondata[f'chkcreateua{i}']
+			else:
+				ua = ''
+			row_i = FormRow(fname,ftype,uadefault,grp,ua)
+
+			if row_i.ua == 'Y':
+				print('creating user attributes')
+				# items_created = add_user_attribute_to_users(email_header_name,fname,data) -- function to be created still
+
+			else:
+				print('creating new user attribute')
+				items_created = create_user_attribute(fname,uadefault, data, uatype='string')
+				print(items_created)
 			i+=1
 		else:
+			print(sessiondata[f'ftype{i}'])
 			i+=1
-	return render_template('process.html', 
-							data=html_table, groups=items_created[0], users=items_created[1])
+	return render_template('process.html', ua=items_created)
 
+
+#### END ROUTES }
 
 
 if __name__ == '__main__':

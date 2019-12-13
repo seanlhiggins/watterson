@@ -34,14 +34,20 @@
 		{% endfor %}
 	</ul>
 	</div>
+
 	<div class="users">
 		<h2> Users Created:</h2>
 
 	<ul>{% for user in users %}
 		<li> {{ user }}</li>
 		{% endfor %}
-
 	</ul>
+	</div>
+
+	<div class="userattributes">
+		<h2> User Attributes Created:</h2>
+		<li> {{ ua }}</li>
+
 	</div>
 </div>
 {% endblock %}

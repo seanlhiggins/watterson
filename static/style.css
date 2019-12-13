@@ -84,25 +84,29 @@
 }
 
 .form-wrapper {
-  padding: 10px 10px 10px 10px
+  padding: 10px
   margin-left:10px;
 }
 
 .instructions {
-  color:#64518A;
+  color:rgba(255,255,255,.85);
 }
 .uploadedcsv {
-  padding: 10px 200px 0px 200px;
+  margin: 50px;
   border: thick;
   float: center;
-  color: #696969;;
+  color: rgba(255,255,255,.85);
+}
+
+.processingoptions{
+  font-size: 12px
 }
 
 .lk-content{
   padding: 10px 10px 1px 10px;
   border: thin;
   float: center;
-  color: #64518A;;
+  color: rgba(255,255,255,.85);
 }
 .checkbox input {
   border: 0;
@@ -158,11 +162,14 @@ input:checked + .checkbox-value {
 input:checked + .checkbox-value::before {
   left: 90%;
 }
-
+.formwrapper{
+  align-content: center;
+  margin: 40px
+}
 .txtin {
     display: block;
     width: 25%;
-    background: transparent;
+    background: white;
     font-size: 15px;
     color: #1b3815;
     line-height: 1.5;
@@ -228,37 +235,26 @@ select-css {
 
 
 
-body#lk-layout-simple {
+body {
     background-color: #2e343f;
     color: white;
     height: auto;
     text-align: center;
     font-family: Nunito,Helvetica,Arial,sans-serif;
     font-weight: 100;
-    font-size: 12px;
+    font-size: 15px;
     background: #2e343f;
 
 }
 
-body {
-    font-family: Nunito,Helvetica,Arial,sans-serif;
 
-}
 
-#lk-layout-simple-header {
-    text-align: center;
-    margin-bottom: 40px;
-}
-.lk-simple-title {
-    text-align: center;
-    margin-bottom: 40px;
-    font-weight: 100;
-    font-size: 20px;
-}
 
 th, td {
   text-align: center;
   padding: 1px;
+  font-size: 12px;
+  width: 100px;
 }
 
 tr {

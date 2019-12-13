@@ -30,7 +30,7 @@
 {% block main %}
 
 
-<div class="form-wrapper">
+<div class="formwrapper">
 	<div class="uploadedcsv">
 	<label class="edit-options-label">
 		<h3>User Edit Options: </h3>
@@ -41,19 +41,19 @@
 		</span>
 	</label>
 		<div class="lk-content">
-			<table class="table table-striped users-table" style="float: center">
-				<thead>
-					<th>Field Name</th>
-					<th>Create As</th>
-					<th>Default Value</th>
-					<th>Add All Users to Group?</th>
-					<th>Assign All Users Default value</th>
+			<table class="table" style="float: center">
+				<thead class="thead">
+					<th width="100%">Field Name</th>
+					<th width="100%">Create As</th>
+					<th width="100%">Default Value</th>
+					<th width="100%">Add All Users to Group?</th>
+					<th width="100%">Assign All Users Default value</th>
 				</thead>
 			<tbody>
 	<!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
 		<form  method=POST action="">
-		{% for header in columns %}
 		<div class="processingoptions">
+		{% for header in columns %}
 		  	<tr>
 		  		<td>
 		  			<input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} >
@@ -73,7 +73,7 @@
 				<td>
 					<label>
 					<span class="checkbox"> 
-						<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateuseratt{{loop.index}}').checked=false">
+						<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateua{{loop.index}}').checked=false">
 						<span class="checkbox-value" aria-hidden="true"></span>
 					</span>
 				</label>
@@ -82,7 +82,7 @@
 				<td>
 					<label>
 						<span class="checkbox"> 
-							<input  type="checkbox" name="chkcreateuseratt{{loop.index}}" id="chkcreateuseratt{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false">
+							<input  type="checkbox" name="chkcreateua{{loop.index}}" id="chkcreateua{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false">
 							<span class="checkbox-value" aria-hidden="true"></span>
 						</span>
 					</label>
@@ -102,11 +102,11 @@
 
 
 
-<br>
+
 {% endblock %}
 {% block tablesummary %}
 <h3>Uploaded data:</h3>
-<div id="pandastable">
+<div class="pandastable">
 		{{ table | safe }}
 </div>
 {% endblock %}
