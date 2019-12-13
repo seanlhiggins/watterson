@@ -61,10 +61,10 @@ def allowed_file(filename):
 # TODO: preliminary checks - 
 ## - Check if the users exist already, if not, create them - DONE
 
-def create_users(email,data):
+def create_users(emailheadername,data):
 	data_without_nulls = data
 	existing_users = {user.email: user.id for user in sdk.all_users()}
-	csv_users = (data_without_nulls[email].unique())
+	csv_users = (data_without_nulls[emailheadername].unique())
 	for email in csv_users:
 		if not existing_users.get(email,):
 			payload = {"name": email}
@@ -137,7 +137,7 @@ def update_group_name(groupheadername, data):
 			except:
 				print("Failed to update" + k)
 
-## Helper function to get the group_id for a supplied group_name.
+## Helper functions to get the id for a supplied group/user attribute.
 ## Output in a dictionary so it can at least reference the right name/id pair.
 
 def get_group_id_for_group_name(group_name):
@@ -145,6 +145,14 @@ def get_group_id_for_group_name(group_name):
 	newdict = dict()
 	for (k,v) in existing_groups.items():
 		if k == group_name:
+			newdict[k] = v
+	return (newdict)
+
+def get_ua_id_for_ua_name(ua_name):
+	existing_ua = {ua.name: ua.id for ua in sdk.all_user_attributes()}
+	newdict = dict()
+	for (k,v) in existing_ua.items():
+		if k == ua_name:
 			newdict[k] = v
 	return (newdict)
 
@@ -156,7 +164,7 @@ def get_group_id_for_group_name(group_name):
 ## in the get_group_id_for_group_name() created dictionary and add them to the group. 
 
 def add_users_to_groups(email_header, group_header,data):
-	data_without_nulls = data
+	data
 
 	users = dict()
 	users_group = dict()
@@ -164,9 +172,9 @@ def add_users_to_groups(email_header, group_header,data):
 	groups_created = create_groups(group_header,data)
 
 	user_emails = []
-	for i in range(0,data_without_nulls.shape[0]):
-		email = data_without_nulls[email_header][i]
-		office = group_header + " - " + data_without_nulls[group_header][i]
+	for i in range(0,data.shape[0]):
+		email = data[email_header][i]
+		office = group_header + " - " + data[group_header][i]
 		users[email]=office
 
 	for k,v in users.items():
@@ -186,8 +194,7 @@ def add_users_to_groups(email_header, group_header,data):
 
 
 ##### USER ATTRIBUTE FUNCTIONS
-def create_user_attribute(ua_name, default_value, data, uatype='string'):
-	data_without_nulls = data
+def create_user_attribute(ua_name, default_value, uatype='string'):
 	existing_ua = {ua.name: ua.id for ua in sdk.all_user_attributes()}
 	if not existing_ua.get(ua_name):
 		try:
@@ -202,6 +209,23 @@ def create_user_attribute(ua_name, default_value, data, uatype='string'):
 	else:
 		print("User Attribute " + ua_name + " already exists")
 		return ua_name, default_value
+
+def set_user_attributes_for_users(email_header, ua_name, value, data):
+	ua_user_set = None
+	create_users(email_header,data)
+	for i in range(0,data.shape[0]):
+		email = data[email_header][i]
+		user_id = sdk.user_for_credential('email',email).id
+		user_attribute_id = get_ua_id_for_ua_name(ua_name)
+		try:
+			payload = {"value": value}
+			payloadjson = json.dumps(payload)
+			print(f'this is the user attribute payload json - {payloadjson}')
+			ua_user_set = sdk.set_user_attribute_user_value(user_id,user_attribute_id,payloadjson)
+			print(f'uhhh ... {ua_user_set}')
+		except:
+			print(f'Failed to add user attribute value to user {user_id}, ua_id - {user_attribute_id} value - {value}')
+	return ua_user_set	
 
 
 ##### ROUTES {
@@ -270,11 +294,11 @@ def uploaded_file(filename):
 	html_table = data.to_html(max_rows=20)
 	print(sessiondata)
 	i=1
-	fname = sessiondata[f'fieldname{i}']
-	ftype = sessiondata[f'ftype{i}']
-	uadefault = sessiondata[f'uadefault{i}']
 
 	while i<=csv_column_headers:
+		fname = sessiondata[f'fieldname{i}']
+		ftype = sessiondata[f'ftype{i}']
+		uadefault = sessiondata[f'uadefault{i}']
 		print(f'checkcreategroup{i} + chkcreateua{i}')
 		if sessiondata[f'ftype{i}'] == 'GRP':
 			print(f'chkcreategroup{i}')
@@ -301,18 +325,21 @@ def uploaded_file(filename):
 		elif sessiondata[f'ftype{i}'] == 'UA':
 			if f'chkcreateua{i}' in sessiondata:
 				ua = sessiondata[f'chkcreateua{i}']
-			grp = None
 			else:
 				ua = ''
+			grp = None
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 
 			if row_i.ua == 'Y':
 				print('creating user attributes and assigning default to all users')
-				# items_created = set_user_attribute_user_value(user_id, user_attribute_id,fname,data) -- function to be created still
-
+				ua_created = create_user_attribute(fname,uadefault, data)
+				print(f'the ua_created is {ua_created}')
+				items_created = set_user_attributes_for_users(email_header_name,fname,uadefault,data) 
+				print('it worked?')
+				return render_template('process.html', ua=items_created)
 			else:
 				print('creating new user attribute')
-				items_created = create_user_attribute(fname,uadefault, data, uatype='string')
+				items_created = create_user_attribute(fname,uadefault, uatype='string')
 				print(items_created)
 				return render_template('process.html', ua=items_created[0],default_value=items_created[1])
 			i+=1
@@ -327,7 +354,7 @@ def uploaded_file(filename):
 				grp = sessiondata[f'chkcreategroup{i}']
 			else:
 				grp = ''
-
+			i+=1
 
 		else:
 			print(sessiondata[f'ftype{i}'])
