@@ -194,11 +194,11 @@ def create_user_attribute(ua_name, default_value, data, uatype='string'):
 		print(f'{existing_ua}')
 		print(f'uavalue = {ua_name}, default = {default_value}')
 		try:
-			payload = {"name": ua_name,"default_value":"","label":ua_name,"type":"string"}
+			payload = {"name": ua_name.lower(),"default_value":"","label":ua_name,"type":"string"}
 			print(f'{payload}')
 			payloadjson=json.dumps(payload)
 			print(f'{payloadjson}')
-			# new_ua = sdk.create_user_attribute(payloadjson)
+			new_ua = sdk.create_user_attribute(payloadjson)
 			# new_ua = sdk.create_user_attribute({"name": "oneuatobindthem","default_value":"",	"label":"This Is Newest","type":"string"})
 			# new_ua = sdk.create_user_attribute({"name": "twouatobindthem","default_value":"","label":"This Is Newerer","type":"string"})
 			# new_ua = sdk.create_user_attribute({"name": "Team", 		  "default_value":"",	"label":"Team", 		  "type":"string"})
@@ -210,6 +210,7 @@ def create_user_attribute(ua_name, default_value, data, uatype='string'):
 		
 	else:
 		print("User Attribute " + ua_name + " already exists")
+		return ua_name, default_value
 
 
 
@@ -337,11 +338,11 @@ def uploaded_file(filename):
 				print('creating new user attribute')
 				items_created = create_user_attribute(fname,uadefault, data, uatype='string')
 				print(items_created)
+				return render_template('process.html', ua=items_created[0],default_value=items_created[1])
 			i+=1
 		else:
 			print(sessiondata[f'ftype{i}'])
 			i+=1
-	return render_template('process.html', ua=items_created)
 
 
 #### END ROUTES }
