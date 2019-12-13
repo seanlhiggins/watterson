@@ -13,3 +13,6 @@ for id in existing_groups:
 existing_users = {user.id for user in sdk.all_users() if user.id > 2}
 for id in existing_users:
 	sdk.delete_user(id)
+existing_user_attributes = {ua.id for ua in sdk.all_user_attributes() if ua.id > 13}
+for id in existing_user_attributes:
+	sdk.delete_user_attribute(id)

@@ -148,7 +148,7 @@ def get_group_id_for_group_name(group_name):
 			newdict[k] = v
 	return (newdict)
 
-# create_groups(csvheadername)
+#
 
 ## Main function that adds users found in the CSV to groups created by the create_groups() function
 ## Needs to go get all the preexisting users (later I'll make a function that checks the users exist first)
@@ -189,20 +189,11 @@ def add_users_to_groups(email_header, group_header,data):
 def create_user_attribute(ua_name, default_value, data, uatype='string'):
 	data_without_nulls = data
 	existing_ua = {ua.name: ua.id for ua in sdk.all_user_attributes()}
-
 	if not existing_ua.get(ua_name):
-		print(f'{existing_ua}')
-		print(f'uavalue = {ua_name}, default = {default_value}')
 		try:
 			payload = {"name": ua_name.lower(),"default_value":"","label":ua_name,"type":"string"}
-			print(f'{payload}')
 			payloadjson=json.dumps(payload)
-			print(f'{payloadjson}')
 			new_ua = sdk.create_user_attribute(payloadjson)
-			# new_ua = sdk.create_user_attribute({"name": "oneuatobindthem","default_value":"",	"label":"This Is Newest","type":"string"})
-			# new_ua = sdk.create_user_attribute({"name": "twouatobindthem","default_value":"","label":"This Is Newerer","type":"string"})
-			# new_ua = sdk.create_user_attribute({"name": "Team", 		  "default_value":"",	"label":"Team", 		  "type":"string"})
-			print(new_ua)
 			print("Created New User Attribute " + ua_name)
 			return ua_name, default_value
 		except:
@@ -211,7 +202,6 @@ def create_user_attribute(ua_name, default_value, data, uatype='string'):
 	else:
 		print("User Attribute " + ua_name + " already exists")
 		return ua_name, default_value
-
 
 
 ##### ROUTES {
@@ -241,7 +231,6 @@ def home():
 		if file and allowed_file(file.filename):
 			filename = secure_filename(file.filename)
 			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			
 			return redirect(url_for('process',
 										filename=filename))
 	return render_template('upload.html')
@@ -254,11 +243,8 @@ def process(filename):
 	html_table = data.to_html(max_rows=20)
 	# Get just the email address header name so we can just quickly use it for creating users - DONE
 	r=re.compile("(?i).*email*")
-
 	emailheadername = list(filter(r.match,data.columns))[0]
-
 	if request.method == 'POST':
-		
 			session['formdata'] = request.form
 			return redirect(url_for('uploaded_file', filename=filename))
 	return render_template('uploaded_file.html', table=html_table,columns=csv_column_headers)
@@ -277,62 +263,52 @@ def uploaded_file(filename):
 
 	# Need to find a nice way to figure out dynamically how many columns have been uploaded, but really how many rows exist in the form 
 	csv_column_headers=len(data_without_nulls.columns)
-	
 
-	user_attributes_created =[]
-	items_created = None
 	r=re.compile("(?i).*email*")
 	# emailheadername = list(filter(r.match,data.columns))[0]
 	email_header_name = 'Email Address'
 	html_table = data.to_html(max_rows=20)
 	print(sessiondata)
 	i=1
+	fname = sessiondata[f'fieldname{i}']
+	ftype = sessiondata[f'ftype{i}']
+	uadefault = sessiondata[f'uadefault{i}']
+
 	while i<=csv_column_headers:
 		print(f'checkcreategroup{i} + chkcreateua{i}')
-		if f'chkcreategroup{i}' in sessiondata:
+		if sessiondata[f'ftype{i}'] == 'GRP':
 			print(f'chkcreategroup{i}')
 		# Have to do this  formatting because the form length will be dynamic based on the CSV size, so the IDs and Names of the HTML elements will be dynamic also.
-			fname = sessiondata[f'fieldname{i}']
-			ftype = sessiondata[f'ftype{i}']
-			uadefault = sessiondata[f'uadefault{i}']
-			grp = sessiondata[f'chkcreategroup{i}']
+			if f'chkcreategroup{i}' in sessiondata:
+				grp = sessiondata[f'chkcreategroup{i}']
+			
 			ua = None
-
 			# Create an object to store all the form values row-wise for concurrent handling
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 
-
-			# If they've checked the Add Users to Group checkbox and create as Group, create the groups and add users, otherwise just Create the Groups.
-			if row_i.grp =='Y' and not row_i.ftype:
-				alert('Choose the data type')
-
-			elif row_i.ftype == 'GRP' and row_i.grp == 'Y':
+			if row_i.grp == 'Y':
 				print('creating groups and adding users to groups')
 				items_created = add_users_to_groups(email_header_name,fname,data)
 				return render_template('process.html', 
 								data=html_table, groups=items_created[0], users=items_created[1])
 
-			elif row_i.ftype == 'GRP':
+			else:
 				print('creating group only')
 				items_created = create_groups(fname,data)
 				return render_template('process.html', 
 							data=html_table, groups=items_created[0])
 		
 		elif sessiondata[f'ftype{i}'] == 'UA':
-			print('got here')
-			fname = sessiondata[f'fieldname{i}']
-			ftype = sessiondata[f'ftype{i}']
-			uadefault = sessiondata[f'uadefault{i}']
-			grp = None
 			if f'chkcreateua{i}' in sessiondata:
 				ua = sessiondata[f'chkcreateua{i}']
+			grp = None
 			else:
 				ua = ''
 			row_i = FormRow(fname,ftype,uadefault,grp,ua)
 
 			if row_i.ua == 'Y':
-				print('creating user attributes')
-				# items_created = add_user_attribute_to_users(email_header_name,fname,data) -- function to be created still
+				print('creating user attributes and assigning default to all users')
+				# items_created = set_user_attribute_user_value(user_id, user_attribute_id,fname,data) -- function to be created still
 
 			else:
 				print('creating new user attribute')
@@ -340,6 +316,19 @@ def uploaded_file(filename):
 				print(items_created)
 				return render_template('process.html', ua=items_created[0],default_value=items_created[1])
 			i+=1
+		
+		elif sessiondata[f'ftype{i}'] == 'Both':
+
+			if f'chkcreateua{i}' in sessiondata:
+				ua = sessiondata[f'chkcreateua{i}']
+			else:
+				ua = ''
+			if f'chkcreategroup{i}' in sessiondata:
+				grp = sessiondata[f'chkcreategroup{i}']
+			else:
+				grp = ''
+
+
 		else:
 			print(sessiondata[f'ftype{i}'])
 			i+=1
