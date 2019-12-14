@@ -15,6 +15,9 @@
 	else
 		return false;;
 	}
+
+
+
 </script>
 </head>
 {% endblock %}
@@ -42,55 +45,66 @@
 	</label>
 		<div class="lk-content">
 			<table class="table" style="float: center">
-				<thead class="thead">
-					<th width="100%">Field Name</th>
-					<th width="100%">Create As</th>
-					<th width="100%">Default Value</th>
-					<th width="100%">Add All Users to Group?</th>
-					<th width="100%">Assign All Users Default value</th>
+				<thead>
+					<tr>
+						<th>Field Name</th>
+						<th>Create As</th>
+						<th>Default Value</th>
+						<th>Add Users to Group?</th>
+						<th>Set Default UA value?</th>
+						<th>Set CSV UA value?</th>
+					</tr>
 				</thead>
-			<tbody>
-	<!-- For every header in the spreadsheet, create a row with checkboxes and buttons, using Jinja's loop.index to make sure we can granularly control selections between each  -->
-		<form  method=POST action="">
-		<div class="processingoptions">
-		{% for header in columns %}
-		  	<tr>
-		  		<td>
-		  			<input type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}} >
-		  		</td>
+			<tbody class="csvtbody">
+				<form  method=POST action="">
+					{% for header in columns %}
+					  	<tr>
+						  		<td>
+						  			<input class="fieldheader" type="text" name="fieldname{{loop.index}}" id="fieldname{{loop.index}}" size="15" value={{header}}>
+						  		</td>
 
-				<td>
-					<select class="select-css" name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
-						<option value="">Select</option>
-						<option value="UA">User Attribute</option>
-						<option value="GRP">Group</option>
-						<option value="Both">Both</option>
-					</select>
-		  		</td>
+								<td>
+									<select class="select-css" name="ftype{{loop.index}}" id="ftype{{loop.index}}" onchange="disableText()">
+										<option value="">Select</option>
+										<option value="UA">User Attribute</option>
+										<option value="GRP">Group</option>
+										<option value="Both">Both</option>
+									</select>
+						  		</td>
 
-		  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
-				
-				<td>
-					<label>
-					<span class="checkbox"> 
-						<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateua{{loop.index}}').checked=false">
-						<span class="checkbox-value" aria-hidden="true"></span>
-					</span>
-				</label>
-				</td>
-				
-				<td>
-					<label>
-						<span class="checkbox"> 
-							<input  type="checkbox" name="chkcreateua{{loop.index}}" id="chkcreateua{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreategroup{{loop.index}}').checked=false">
-							<span class="checkbox-value" aria-hidden="true"></span>
-						</span>
-					</label>
-				</td>
+						  		<td><input type="text" name="uadefault{{loop.index}}" id="uadefault{{loop.index}}" size="15" title="User Attribute default value"></td>
+								
+								<td>
+									<label>
+									<span class="checkbox"> 
+										<input type="checkbox" name="chkcreategroup{{loop.index}}" id="chkcreategroup{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('uadefault{{loop.index}}').disabled=true;">
+										<span class="checkbox-value" aria-hidden="true"></span>
+									</span>
+								</label>
+								</td>
+								
+								<td>
+									<label>
+										<span class="checkbox"> 
+											<input  type="checkbox" name="chkcreateua{{loop.index}}" id="chkcreateua{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkuauserval{{loop.index}}').checked=false">
+											<span class="checkbox-value" aria-hidden="true"></span>
+										</span>
+									</label>
+							
+								</td>
 
+								<td>
+									<label>
+										<span class="checkbox"> 
+											<input  type="checkbox" name="chkuauserval{{loop.index}}" id="chkuauserval{{loop.index}}" value="Y" onclick="if(this.checked)document.getElementById('chkcreateua{{loop.index}}').checked=false">
+											<span class="checkbox-value" aria-hidden="true"></span>
+										</span>
+									</label>
+							
+								</td>
 
-			</tr>
-		</div>
+						</tr>
+
 		{% endfor %}
 				<input type=submit class="btn btn-primary" action="/process/{{filename}}" name="action" value="Process File" onClick="conf()">
 				</form>
